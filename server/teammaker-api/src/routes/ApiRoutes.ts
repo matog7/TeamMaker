@@ -14,6 +14,30 @@ router.get("/teams", async (req, res) => {
   res.json(result.rows);
 });
 
+router.post("/teams", async (req, res) => {
+  const { name, formation_id } = req.body;
+  const result = await query(
+    "INSERT INTO teams (name, formation_id) VALUES ($1, $2) RETURNING *",
+    [name, formation_id]
+  );
+  res.json(result.rows[0]);
+});
+
+router.post("/team-players/:teamId", async (req, res) => {
+  const { teamId } = req.params;
+  const { players } = req.body;
+  for (const [positionIndex, playerValue] of Object.entries(players)) {
+    // Ensure playerValue is of the expected type
+    const player = playerValue as { id: number; is_captain?: boolean };
+    await query(
+      "INSERT INTO team_players (team_id, player_id, position_order, is_captain) VALUES ($1, $2, $3, $4) RETURNING *",
+      [teamId, player.id, parseInt(positionIndex), player.is_captain || false]
+    );
+  }
+
+  res.json(players);
+});
+
 router.get("/players", async (req, res) => {
   const result = await query("SELECT * FROM players");
   res.json(result.rows);

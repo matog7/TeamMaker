@@ -3,6 +3,7 @@ export interface Player {
   name: string;
   rating: number;
   potential: number;
+  is_captain: boolean;
   photo?: string;
   position: "GK" | "DEF" | "MID" | "ATT";
   age?: number;

@@ -6,6 +6,7 @@ import type {
   TeamCreate,
   PlayerSearchCriteria,
   TeamUpdate,
+  Player,
 } from "../interfaces";
 import { API_CONFIG } from "../config/configApi";
 
@@ -102,6 +103,15 @@ export const teamAPI = {
   // Créer une équipe
   create: async (team: TeamCreate) => {
     const response = await api.post("/teams", team);
+    return response.data;
+  },
+
+  createWithPlayers: async (
+    teamId: number,
+    players: Record<string, Player>
+  ) => {
+    console.log("Creating team with players:", players);
+    const response = await api.post(`/team-players/${teamId}`, { players });
     return response.data;
   },
 
