@@ -1,0 +1,78 @@
+-- Script de création des tables pour TeamMaker
+-- Base de données PostgreSQL
+
+-- Table des joueurs
+CREATE TABLE IF NOT EXISTS players (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating >= 0 AND rating <= 100),
+    potential INTEGER NOT NULL CHECK (potential >= 0 AND potential <= 100),
+    photo VARCHAR(255),
+    position VARCHAR(20) NOT NULL CHECK (position IN ('GK', 'DEF', 'MID', 'ATT')),
+    age INTEGER CHECK (age >= 16 AND age <= 45),
+    nationality VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table des formations
+CREATE TABLE IF NOT EXISTS formations (
+    id VARCHAR(10) PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table des positions dans les formations
+CREATE TABLE IF NOT EXISTS formation_positions (
+    id SERIAL PRIMARY KEY,
+    formation_id VARCHAR(10) REFERENCES formations(id) ON DELETE CASCADE,
+    position_order INTEGER NOT NULL,
+    x_coordinate DECIMAL(5,2) NOT NULL,
+    y_coordinate DECIMAL(5,2) NOT NULL,
+    position_type VARCHAR(20) NOT NULL CHECK (position_type IN ('GK', 'DEF', 'MID', 'ATT'))
+);
+
+-- Table des équipes
+CREATE TABLE IF NOT EXISTS teams (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    formation_id VARCHAR(10) REFERENCES formations(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Table de liaison équipes-joueurs
+CREATE TABLE IF NOT EXISTS team_players (
+    id SERIAL PRIMARY KEY,
+    team_id INTEGER REFERENCES teams(id) ON DELETE CASCADE,
+    player_id INTEGER REFERENCES players(id) ON DELETE CASCADE,
+    position_order INTEGER NOT NULL,
+    is_captain BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(team_id, player_id),
+    UNIQUE(team_id, position_order)
+);
+
+
+-- Index pour améliorer les performances
+CREATE INDEX IF NOT EXISTS idx_players_position ON players(position);
+CREATE INDEX IF NOT EXISTS idx_players_rating ON players(rating);
+CREATE INDEX IF NOT EXISTS idx_formation_positions_formation_id ON formation_positions(formation_id);
+CREATE INDEX IF NOT EXISTS idx_team_players_team_id ON team_players(team_id);
+CREATE INDEX IF NOT EXISTS idx_team_players_player_id ON team_players(player_id);
+
+-- Trigger pour mettre à jour updated_at automatiquement
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_players_updated_at BEFORE UPDATE ON players
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_teams_updated_at BEFORE UPDATE ON teams
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
