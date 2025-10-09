@@ -42,6 +42,7 @@ export const formationAPI = {
 
   // Récupérer les positions d'une formation
   getPositions: async (formationId: string): Promise<FormationPosition[]> => {
+    console.log("Récupération des positions de la formation:", formationId);
     const response = await api.get(`/formation-positions/${formationId}`);
     return response.data;
   },

@@ -13,16 +13,16 @@ ON CONFLICT (id) DO NOTHING;
 -- Insertion des positions pour la formation 4-4-2
 INSERT INTO formation_positions (formation_id, position_order, x_coordinate, y_coordinate, position_type) VALUES
 ('442', 1, 50.00, 90.00, 'GK'),  -- Gardien
-('442', 2, 20.00, 70.00, 'DEF'), -- Défenseur gauche
-('442', 3, 40.00, 70.00, 'DEF'), -- Défenseur central gauche
-('442', 4, 60.00, 70.00, 'DEF'), -- Défenseur central droit
-('442', 5, 80.00, 70.00, 'DEF'), -- Défenseur droit
-('442', 6, 20.00, 50.00, 'MID'), -- Milieu gauche
-('442', 7, 40.00, 50.00, 'MID'), -- Milieu central gauche
-('442', 8, 60.00, 50.00, 'MID'), -- Milieu central droit
-('442', 9, 80.00, 50.00, 'MID'), -- Milieu droit
-('442', 10, 35.00, 30.00, 'ATT'), -- Attaquant gauche
-('442', 11, 65.00, 30.00, 'ATT')  -- Attaquant droit
+('442', 2, 10.00, 70.00, 'DEF'), -- Défenseur gauche
+('442', 3, 40.00, 75.00, 'DEF'), -- Défenseur central gauche
+('442', 4, 60.00, 75.00, 'DEF'), -- Défenseur central droit
+('442', 5, 90.00, 70.00, 'DEF'), -- Défenseur droit
+('442', 6, 10.00, 40.00, 'MID'), -- Milieu gauche
+('442', 7, 35.00, 55.00, 'MID'), -- Milieu central gauche
+('442', 8, 65.00, 55.00, 'MID'), -- Milieu central droit
+('442', 9, 90.00, 40.00, 'MID'), -- Milieu droit
+('442', 10, 35.00, 20.00, 'ATT'), -- Attaquant gauche
+('442', 11, 65.00, 20.00, 'ATT')  -- Attaquant droit
 ON CONFLICT DO NOTHING;
 
 -- Insertion des positions pour la formation 4-3-3
@@ -53,6 +53,34 @@ INSERT INTO formation_positions (formation_id, position_order, x_coordinate, y_c
 ('41212', 9, 85.00, 45.00, 'MID'), -- Milieu droit
 ('41212', 10, 35.00, 15.00, 'ATT'), -- Attaquant gauche
 ('41212', 11, 65.00, 15.00, 'ATT')  -- Attaquant droit
+ON CONFLICT DO NOTHING;
+
+INSERT INTO formation_positions (formation_id, position_order, x_coordinate, y_coordinate, position_type) VALUES
+('352', 1, 50.00, 90.00, 'GK'),  -- Gardien
+('352', 2, 20.00, 75.00, 'DEF'), -- Défenseur central gauche
+('352', 3, 50.00, 75.00, 'DEF'), -- Défenseur central
+('352', 4, 80.00, 75.00, 'DEF'), -- Défenseur central droit
+('352', 5, 65.00, 55.00, 'MID'), -- Milieu défensif droit
+('352', 6, 35.00, 55.00, 'MID'), -- Milieu défensif gauche
+('352', 7, 10.00, 50.00, 'MID'), -- Milieu gauche
+('352', 8, 50.00, 40.00, 'MID'), -- Milieu offensif
+('352', 9, 90.00, 50.00, 'MID'), -- Milieu droit
+('352', 10, 35.00, 20.00, 'ATT'), -- Attaquant gauche
+('352', 11, 65.00, 20.00, 'ATT')  -- Attaquant droit
+ON CONFLICT DO NOTHING;
+
+INSERT INTO formation_positions (formation_id, position_order, x_coordinate, y_coordinate, position_type) VALUES
+('532', 1, 50.00, 90.00, 'GK'),  -- Gardien
+('532', 2, 10.00, 65.00, 'DEF'), -- Défenseur gauche
+('532', 3, 30.00, 75.00, 'DEF'), -- Défenseur central gauche
+('532', 4, 50.00, 75.00, 'DEF'), -- Défenseur central
+('532', 5, 70.00, 75.00, 'DEF'), -- Défenseur central droit
+('532', 6, 90.00, 65.00, 'DEF'), -- Défenseur droit
+('532', 7, 65.00, 55.00, 'MID'), -- Milieu défensif droit
+('532', 8, 35.00, 55.00, 'MID'), -- Milieu défensif gauche
+('532', 9, 50.00, 40.00, 'MID'), -- Milieu offensif
+('532', 10, 35.00, 20.00, 'ATT'), -- Attaquant gauche
+('532', 11, 65.00, 20.00, 'ATT')  -- Attaquant droit
 ON CONFLICT DO NOTHING;
 
 -- Insertion de joueurs d'exemple

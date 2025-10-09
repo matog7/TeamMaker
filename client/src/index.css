@@ -46,8 +46,14 @@ button {
   transition: border-color 0.25s;
 }
 
+button.isHighlighted {
+  border-color: #03af62;
+  color: #79eea5;
+}
+
 button:hover {
   border-color: #03af62;
+  color: #79eea5;
 }
 
 button:active {
@@ -56,7 +62,8 @@ button:active {
 
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px auto -webkit-focus-ring-color;
+  outline-color: #03af62;
 }
 
 @media (prefers-color-scheme: light) {

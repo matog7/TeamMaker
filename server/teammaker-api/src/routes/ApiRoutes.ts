@@ -1,6 +1,7 @@
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import { query } from "../lib/db";
+import { Player } from "../interfaces/player";
 
 const router = Router();
 
@@ -16,31 +17,114 @@ router.get("/teams", async (req, res) => {
 
 router.post("/teams", async (req, res) => {
   const { name, formation_id } = req.body;
+  const [created_at, updated_at] = [new Date(), new Date()];
   const result = await query(
-    "INSERT INTO teams (name, formation_id) VALUES ($1, $2) RETURNING *",
-    [name, formation_id]
+    "INSERT INTO teams (name, formation_id, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING *",
+    [name, formation_id, created_at, updated_at]
   );
   res.json(result.rows[0]);
 });
 
-router.post("/team-players/:teamId", async (req, res) => {
-  const { teamId } = req.params;
-  const { players } = req.body;
-  for (const [positionIndex, playerValue] of Object.entries(players)) {
-    // Ensure playerValue is of the expected type
-    const player = playerValue as { id: number; is_captain?: boolean };
-    await query(
-      "INSERT INTO team_players (team_id, player_id, position_order, is_captain) VALUES ($1, $2, $3, $4) RETURNING *",
-      [teamId, player.id, parseInt(positionIndex), player.is_captain || false]
-    );
-  }
-
-  res.json(players);
+router.put("/teams/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, formation_id } = req.body;
+  const updated_at = new Date();
+  const result = await query(
+    "UPDATE teams SET name = $1, formation_id = $2, updated_at = $3 WHERE id = $4 RETURNING *",
+    [name, formation_id, updated_at, id]
+  );
+  res.json(result.rows[0]);
 });
 
 router.get("/players", async (req, res) => {
   const result = await query("SELECT * FROM players");
   res.json(result.rows);
+});
+
+router.post("/team-players/:teamId", async (req, res) => {
+  const { teamId } = req.params;
+  const { players } = req.body;
+
+  // **************************************************************
+  // insertion des joueurs qui n'existent pas encore
+  // **************************************************************
+
+  // vérifier si le joueur existe déjà
+  const existingPlayers = await query("SELECT name FROM players");
+  console.log("existingPlayers", existingPlayers.rows);
+  const existingPlayersNames = existingPlayers.rows.map(
+    (player) => player.name
+  );
+  console.log("existingPlayersNames", existingPlayersNames);
+  const playersToInsert = Object.entries(players).filter(
+    ([_, player]) => !existingPlayersNames.includes((player as Player).name)
+  );
+  console.log("playersToInsertAfterFilter", playersToInsert);
+  for (const [_, player] of playersToInsert) {
+    const result = await query(
+      "INSERT INTO players (name, rating, potential, photo, position, age, nationality) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [
+        (player as Player).name,
+        (player as Player).rating,
+        (player as Player).potential,
+        (player as Player).photo,
+        (player as Player).position,
+        (player as Player).age,
+        (player as Player).nationality,
+      ]
+    );
+    console.log("result", result);
+  }
+  console.log("players inserted");
+
+  // **************************************************************
+  // insertion des joueurs dans l'équipe
+  // **************************************************************
+
+  // vérifier si le joueur existe déjà dans l'équipe
+  const existingTeamPlayers = await query(
+    "SELECT * FROM team_players WHERE team_id = $1",
+    [teamId]
+  );
+  const existingTeamPlayersIds = existingTeamPlayers.rows.map(
+    (player) => player.player_id
+  );
+  const teamPlayersToInsert = Object.entries(players).filter(
+    ([_, player]) => !existingTeamPlayersIds.includes((player as Player).id)
+  );
+
+  console.log("teamPlayersToInsert", teamPlayersToInsert);
+  console.log("existingTeamPlayersIds", existingTeamPlayersIds);
+  console.log("existingTeamPlayers", existingTeamPlayers);
+  console.log("players", players);
+
+  // insertion des joueurs dans l'équipe
+  for (const [positionIndex, playerValue] of teamPlayersToInsert) {
+    const player = playerValue as {
+      id: number;
+      is_captain?: boolean;
+      name: string;
+    };
+    const playerId = await query(
+      "SELECT id FROM players WHERE name = $1 LIMIT 1",
+      [player.name]
+    );
+    console.log("playerId", playerId?.rows[0]?.id);
+    console.log("positionIndex", parseInt(positionIndex + 1));
+    console.log("is_captain", player.is_captain || false);
+    console.log("teamId", teamId);
+    await query(
+      "INSERT INTO team_players (team_id, player_id, position_order, is_captain) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING",
+      [
+        teamId,
+        playerId.rows[0].id,
+        parseInt(positionIndex) + 1,
+        player.is_captain || false,
+      ]
+    );
+  }
+  console.log("team_players inserted");
+  res.json({ message: "team_players inserted" });
 });
 
 router.get("/formation-positions", async (req, res) => {

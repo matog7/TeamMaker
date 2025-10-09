@@ -1,12 +1,11 @@
 export interface Player {
   id: number;
   name: string;
-  rating?: number;
-  potential?: number;
+  rating: number;
+  potential: number;
   is_captain: boolean;
-  position_order?: number;
   photo?: string;
-  position?: "GK" | "DEF" | "MID" | "ATT";
+  position: "GK" | "DEF" | "MID" | "ATT";
   age?: number;
   nationality?: string;
   created_at: string;
