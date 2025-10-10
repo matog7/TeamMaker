@@ -24,13 +24,30 @@ export interface PlayerCreate {
 }
 
 export interface PlayerUpdate {
-  name?: string;
-  rating?: number;
-  potential?: number;
-  photo?: string;
-  position?: "GK" | "DEF" | "MID" | "ATT";
   age?: number;
+  created_at?: string;
+  id?: number;
+  is_captain?: boolean;
+  name?: string;
   nationality?: string;
+  photo: string;
+  player_id?: number;
+  position?: "GK" | "DEF" | "MID" | "ATT";
+  position_order?: number;
+  potential?: number;
+  rating?: number;
+  team_id?: number;
+  updated_at?: string;
+}
+
+export interface PlayerUpdateSend {
+  age?: string;
+  name?: string;
+  nationality?: string;
+  photo?: string;
+  position?: string;
+  potential?: string;
+  rating?: string;
 }
 
 export interface PlayerSearchCriteria {

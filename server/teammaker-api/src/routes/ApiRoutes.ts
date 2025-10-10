@@ -41,6 +41,18 @@ router.get("/players", async (req, res) => {
   res.json(result.rows);
 });
 
+router.put("/players/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, rating, potential, photo, position, age, nationality } =
+    req.body;
+  const updated_at = new Date();
+  const result = await query(
+    "UPDATE players SET name = $1, rating = $2, potential = $3, photo = $4, position = $5, age = $6, nationality = $7, updated_at = $8 WHERE id = $9 RETURNING *",
+    [name, rating, potential, photo, position, age, nationality, updated_at, id]
+  );
+  res.json(result.rows[0]);
+});
+
 router.post("/team-players/:teamId", async (req, res) => {
   const { teamId } = req.params;
   const { players } = req.body;
@@ -57,7 +69,9 @@ router.post("/team-players/:teamId", async (req, res) => {
   );
   console.log("existingPlayersNames", existingPlayersNames);
   const playersToInsert = Object.entries(players).filter(
-    ([_, player]) => !existingPlayersNames.includes((player as Player).name)
+    ([_, player]) =>
+      !existingPlayersNames.includes((player as Player).name) &&
+      (player as Player).name !== ""
   );
   console.log("playersToInsertAfterFilter", playersToInsert);
   for (const [_, player] of playersToInsert) {
@@ -87,10 +101,12 @@ router.post("/team-players/:teamId", async (req, res) => {
     [teamId]
   );
   const existingTeamPlayersIds = existingTeamPlayers.rows.map(
-    (player) => player.player_id
+    (player) => player.id
   );
   const teamPlayersToInsert = Object.entries(players).filter(
-    ([_, player]) => !existingTeamPlayersIds.includes((player as Player).id)
+    ([_, player]) =>
+      !existingTeamPlayersIds.includes((player as Player).id) &&
+      (player as Player).name !== ""
   );
 
   console.log("teamPlayersToInsert", teamPlayersToInsert);
@@ -109,19 +125,24 @@ router.post("/team-players/:teamId", async (req, res) => {
       "SELECT id FROM players WHERE name = $1 LIMIT 1",
       [player.name]
     );
-    console.log("playerId", playerId?.rows[0]?.id);
+    console.log("player", playerId?.rows[0]);
     console.log("positionIndex", parseInt(positionIndex + 1));
     console.log("is_captain", player.is_captain || false);
     console.log("teamId", teamId);
-    await query(
-      "INSERT INTO team_players (team_id, player_id, position_order, is_captain) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING",
-      [
-        teamId,
-        playerId.rows[0].id,
-        parseInt(positionIndex) + 1,
-        player.is_captain || false,
-      ]
-    );
+    try {
+      await query(
+        "INSERT INTO team_players (team_id, player_id, position_order, is_captain) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING",
+        [
+          teamId,
+          playerId.rows[0].id,
+          parseInt(positionIndex) + 1,
+          player.is_captain || false,
+        ]
+      );
+    } catch (error) {
+      console.log("error", error);
+      throw error;
+    }
   }
   console.log("team_players inserted");
   res.json({ message: "team_players inserted" });

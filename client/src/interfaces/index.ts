@@ -3,6 +3,7 @@ export type {
   Player,
   PlayerCreate,
   PlayerUpdate,
+  PlayerUpdateSend,
   PlayerSearchCriteria,
 } from "./player";
 

@@ -7,6 +7,7 @@ import type {
   PlayerSearchCriteria,
   TeamUpdate,
   Player,
+  PlayerUpdateSend,
 } from "../interfaces";
 import { API_CONFIG } from "../config/configApi";
 
@@ -77,6 +78,12 @@ export const playerAPI = {
   // Rechercher des joueurs
   search: async (criteria: PlayerSearchCriteria) => {
     const response = await api.get("/players/search", { params: criteria });
+    return response.data;
+  },
+
+  // Mettre à jour un joueur
+  update: async (id: number, player: PlayerUpdateSend) => {
+    const response = await api.put(`/players/${id}`, player);
     return response.data;
   },
 };

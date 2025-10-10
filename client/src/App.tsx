@@ -5,8 +5,9 @@ import type {
   FormationWithPositions,
   Team,
   TeamPlayer,
+  PlayerUpdate,
 } from "./interfaces";
-import { formationAPI, teamAPI } from "./services/api";
+import { formationAPI, playerAPI, teamAPI } from "./services/api";
 import { ERROR_MESSAGES } from "./config/configApi";
 import toast, { Toaster } from "react-hot-toast";
 import {
@@ -78,7 +79,7 @@ function App() {
       }
     };
     fetchTeams();
-  }, [teams]);
+  }, []);
 
   // Récupération des joueurs d'une équipe sélectionnée
   useEffect(() => {
@@ -161,6 +162,7 @@ function App() {
 
   // Ouvre la modale pour une position donnée
   const openModal = (index: number) => {
+    console.log("index", index);
     setEditingIndex(index);
     setModalOpen(true);
   };
@@ -169,6 +171,7 @@ function App() {
   const closeModal = () => {
     setModalOpen(false);
     setEditingIndex(null);
+    console.log("Nouvelle Liste de joueurs", players);
   };
 
   // Gère la soumission du formulaire de joueur
@@ -179,8 +182,10 @@ function App() {
     photo: string;
     age: string;
     nationality: string;
+    position: string;
   }) => {
     if (editingIndex === null) return;
+    console.log("playerData", playerData, editingIndex);
     setPlayers({
       ...players,
       [editingIndex]: {
@@ -191,10 +196,46 @@ function App() {
         photo: playerData.photo,
         age: Number(playerData.age),
         nationality: playerData.nationality,
-        position: "ATT",
+        position: playerData.position,
       } as Player,
     });
     closeModal();
+  };
+
+  // Gère la mise à jour d'un joueur
+  const handlePlayerUpdate = async (
+    player: PlayerUpdate,
+    playerData: {
+      name: string;
+      rating: string;
+      potential: string;
+      photo: string;
+      age: string;
+      nationality: string;
+      position: string;
+    }
+  ) => {
+    if (!editingIndex) return;
+    try {
+      const updatedPlayer = await playerAPI.update(
+        player?.player_id as number,
+        playerData
+      );
+      console.log("updatedPlayer", updatedPlayer);
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour du joueur:", err);
+    } finally {
+      toast.success("Joueur mis à jour avec succès !", {
+        duration: 3000,
+        position: "top-right",
+        style: {
+          background: "#10B981",
+          color: "#fff",
+        },
+      });
+      setModalOpen(false);
+      setEditingIndex(null);
+    }
   };
 
   // Ouvre la modale pour créer une nouvelle équipe
@@ -412,8 +453,14 @@ function App() {
         isOpen={modalOpen}
         editingIndex={editingIndex}
         player={editingIndex !== null ? players[editingIndex] : null}
+        playerPosition={
+          editingIndex !== null
+            ? selectedFormation?.positions[editingIndex]
+            : null
+        }
         onClose={closeModal}
         onSubmit={handlePlayerSubmit}
+        handlePlayerUpdate={handlePlayerUpdate}
       />
 
       <NewTeamModal

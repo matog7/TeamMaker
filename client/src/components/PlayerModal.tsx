@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from "react";
-import type { Player } from "../interfaces";
 import { MonitorUp } from "lucide-react";
+import type { FormationPosition, Player, PlayerUpdate } from "../interfaces";
+import { nationalities } from "../config/consts";
 
 interface PlayerModalProps {
   isOpen: boolean;
   editingIndex: number | null;
   player: Player | null;
+  playerPosition: FormationPosition | null | undefined;
   onClose: () => void;
   onSubmit: (playerData: {
     name: string;
@@ -14,15 +16,29 @@ interface PlayerModalProps {
     photo: string;
     age: string;
     nationality: string;
+    position: string;
   }) => void;
+  handlePlayerUpdate: (
+    player: PlayerUpdate,
+    playerData: {
+      name: string;
+      rating: string;
+      potential: string;
+      photo: string;
+      age: string;
+      nationality: string;
+      position: string;
+    }
+  ) => void;
 }
 
 const PlayerModal: React.FC<PlayerModalProps> = ({
   isOpen,
-  //   editingIndex,
   player,
   onClose,
+  playerPosition,
   onSubmit,
+  handlePlayerUpdate,
 }) => {
   const [form, setForm] = useState({
     name: "",
@@ -31,62 +47,13 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
     photo: "",
     age: "",
     nationality: "",
+    position: "",
   });
 
   // États pour le select avec recherche
   const [nationalitySearch, setNationalitySearch] = useState("");
   const [showNationalityDropdown, setShowNationalityDropdown] = useState(false);
   const nationalityDropdownRef = useRef<HTMLDivElement>(null);
-
-  // Liste des nationalités
-  const nationalities = [
-    "France",
-    "Espagne",
-    "Italie",
-    "Allemagne",
-    "Angleterre",
-    "Portugal",
-    "Belgique",
-    "Suisse",
-    "Pays-Bas",
-    "Autriche",
-    "Pologne",
-    "République Tchèque",
-    "Slovaquie",
-    "Hongrie",
-    "Grèce",
-    "Turquie",
-    "Roumanie",
-    "Bulgarie",
-    "Croatie",
-    "Serbie",
-    "Monténégro",
-    "Bosnie-Herzégovine",
-    "Macédoine",
-    "Albanie",
-    "Brésil",
-    "Argentine",
-    "Uruguay",
-    "Chili",
-    "Colombie",
-    "Mexique",
-    "États-Unis",
-    "Canada",
-    "Japon",
-    "Corée du Sud",
-    "Chine",
-    "Australie",
-    "Nouvelle-Zélande",
-    "Afrique du Sud",
-    "Égypte",
-    "Maroc",
-    "Algérie",
-    "Tunisie",
-    "Sénégal",
-    "Côte d'Ivoire",
-    "Nigeria",
-    "Ghana",
-  ];
 
   // Filtrer les nationalités selon la recherche
   const filteredNationalities = nationalities.filter((nationality) =>
@@ -113,6 +80,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
   // Initialiser le formulaire quand la modale s'ouvre
   useEffect(() => {
     if (isOpen && player) {
+      console.log("player", player);
       setForm({
         name: player.name || "",
         rating: player.rating?.toString() || "",
@@ -120,6 +88,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
         photo: player.photo || "",
         age: player.age?.toString() || "",
         nationality: player.nationality || "",
+        position: playerPosition?.position_type || "",
       });
       setNationalitySearch(player.nationality || "");
     } else if (isOpen) {
@@ -130,6 +99,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
         photo: "",
         age: "",
         nationality: "",
+        position: "",
       });
       setNationalitySearch("");
     }
@@ -169,7 +139,8 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
           &times;
         </button>
         <h3 className="text-lg font-bold mb-4 text-white">
-          {player ? "Modifier" : "Ajouter"} un joueur
+          {player?.name && player.name !== "" ? "Modifier" : "Ajouter"} un
+          joueur
         </h3>
         <form
           onSubmit={handleSubmit}
@@ -338,12 +309,16 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
               />
             </div>
           </div>
-          <button
-            type="submit"
-            // className="isG"
-          >
-            Valider
-          </button>
+
+          {player?.name === "" ? (
+            <button type="submit">Valider</button>
+          ) : (
+            <button
+              onClick={() => handlePlayerUpdate(player as PlayerUpdate, form)}
+            >
+              Mettre à jour
+            </button>
+          )}
         </form>
       </div>
     </div>
