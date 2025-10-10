@@ -46,9 +46,7 @@ const FootballField: React.FC<FootballFieldProps> = ({
           {selectedFormation?.positions.map((position, index) => (
             <motion.div
               key={index}
-              className={`absolute w-16 h-16 bg-white/95 border-2 border-gray-700 rounded-full flex items-center justify-center cursor-pointer shadow-lg overflow-hidden text-ellipsis whitespace-nowrap ${
-                players[index]?.is_captain ? "border-orange-500" : ""
-              }`}
+              className="absolute cursor-pointer shadow-lg "
               style={{
                 left: `${position.x_coordinate}%`,
                 top: `${position.y_coordinate}%`,
@@ -57,29 +55,48 @@ const FootballField: React.FC<FootballFieldProps> = ({
               onClick={() => onPlayerClick(index)}
             >
               {players[index] && players[index]?.id !== 0 ? (
-                <div className="flex flex-col items-center justify-center">
-                  <div className="font-bold text-sm text-gray-900">
-                    {players[index].name}
+                <div className="flex flex-col items-center">
+                  <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200/50 shadow-lg ">
+                    {players[index].photo ? (
+                      <img
+                        src={`/uploads/${players[index].photo}`}
+                        alt="photo"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 text-lg font-bold">
+                        {(players[index].name || "J")
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()}
+                      </div>
+                    )}
                   </div>
                   <div
-                    className={`text-xs ${
+                    className={`absolute -top-2  transform -translate-x-1/2 text-xs font-bold ${
                       players[index].rating && players[index].rating > 70
                         ? "bg-green-600"
-                        : "bg-yellow-500"
-                    } text-white rounded-full px-2 py-0.5 mt-1`}
+                        : players[index].rating && players[index].rating > 60
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
+                    } text-white rounded-full px-2 py-1 border-2 border-gray-200/50 shadow-md `}
                   >
                     {players[index].rating}
                   </div>
-                  {players[index].photo && (
-                    <img
-                      src={players[index].photo}
-                      alt="photo"
-                      className="w-8 h-8 rounded-full mx-auto mt-1 object-cover border border-gray-400"
-                    />
+                  {players[index].is_captain && (
+                    <div className="absolute -bottom-[-25px] right-2 transform -translate-x-1/2 text-xs font-bold bg-orange-500 text-white rounded-full px-1 py-1 border-2 border-gray-200/50 shadow-md">
+                      C
+                    </div>
                   )}
+                  <div className="font-bold text-xs text-white mt-1 text-center bg-gray-200/20 px-1 py-0.5 backdrop-blur-sm rounded max-w-25 truncate">
+                    {players[index].name}
+                  </div>
                 </div>
               ) : (
-                <div className="text-gray-500 text-2xl font-bold">+</div>
+                <div className="w-16 h-16 bg-white/20 border-2 border-dashed border-gray-200/50 rounded-full flex items-center justify-center">
+                  <div className="text-white text-2xl font-bold">+</div>
+                </div>
               )}
             </motion.div>
           ))}

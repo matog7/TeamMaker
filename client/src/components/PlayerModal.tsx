@@ -103,6 +103,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
       });
       setNationalitySearch("");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, player]);
 
   // Gère la sélection d'une nationalité
@@ -254,7 +255,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
               Photo
             </label>
             <div
-              className="w-full h-20 border-2 border-dashed border-gray-300/50 rounded px-2 py-4 text-center cursor-pointer bg-green-300/10 hover:bg-gray-100/20 transition-all duration-200 mt-4"
+              className="w-full h-30 border-2 border-dashed border-gray-300/50 rounded px-2 py-4 text-center cursor-pointer bg-green-300/10 hover:bg-gray-100/20 transition-all duration-200 mt-4"
               onClick={() =>
                 document.getElementById("player-photo-input")?.click()
               }
@@ -276,9 +277,9 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
             >
               {form.photo ? (
                 <img
-                  src={form.photo}
+                  src={player?.photo ? `/uploads/${player.photo}` : form.photo}
                   alt="aperçu"
-                  className="mx-auto h-20 w-20 object-cover rounded-full mb-2"
+                  className="mx-auto h-20 w-20 object-cover rounded-full "
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center">

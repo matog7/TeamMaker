@@ -20,6 +20,7 @@ import {
   NewTeamModal,
   UpdateTeamModal,
 } from "./components";
+import SubstitutesSection from "./components/SubstitutesSection";
 
 function App() {
   const [formations, setFormations] = useState<FormationWithPositions[]>([]);
@@ -30,6 +31,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [players, setPlayers] = useState<Record<number, Player>>({});
+  const [subs, setSubs] = useState<Record<number, Player>>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
@@ -79,7 +81,7 @@ function App() {
       }
     };
     fetchTeams();
-  }, []);
+  }, [selectedTeam]);
 
   // Récupération des joueurs d'une équipe sélectionnée
   useEffect(() => {
@@ -94,8 +96,19 @@ function App() {
               a.position_order - b.position_order
           );
           if (sortedPlayers.length > 10) {
-            console.log("sortedPlayers", sortedPlayers);
-            setPlayers(sortedPlayers);
+            const eleven = sortedPlayers.slice(0, 11);
+            const subs = sortedPlayers.slice(11);
+            console.log(
+              "sortedPlayers",
+              sortedPlayers,
+              "eleven",
+              eleven,
+              "subs",
+              subs
+            );
+
+            setPlayers(eleven);
+            setSubs(subs);
           } else {
             const playerList: Player[] = [];
             for (let i = 0; i < 11; i++) {
@@ -115,7 +128,10 @@ function App() {
                 };
               }
             }
-            console.log("custom playerList", playerList);
+            console.log(
+              "custom playerList de l'équipe sélectionnée",
+              playerList
+            );
             setPlayers(playerList);
           }
 
@@ -138,7 +154,7 @@ function App() {
     };
     fetchTeamPlayers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTeam]);
+  }, [selectedTeam, formations]);
 
   // Récupération de la formation de l'équipe sélectionnée
   useEffect(() => {
@@ -152,13 +168,19 @@ function App() {
           (f) => f.id === selectedTeam.formation_id
         );
         if (formation) {
-          console.log("La formation sélectionnée est:", formation);
+          console.log("La formation de l'équipesélectionnée est:", formation);
           setSelectedFormation(formation);
         }
       }
     };
     fetchFormation();
   }, [selectedTeam, formations]);
+
+  // Recharge la page
+  const reload = (team: Team) => {
+    localStorage.setItem("team", JSON.stringify(team));
+    window.location.reload();
+  };
 
   // Ouvre la modale pour une position donnée
   const openModal = (index: number) => {
@@ -172,6 +194,21 @@ function App() {
     setModalOpen(false);
     setEditingIndex(null);
     console.log("Nouvelle Liste de joueurs", players);
+  };
+
+  // Supprime un joueur de l'équipe
+  const removePlayer = (index: number) => {
+    const newPlayers = { ...players };
+    delete newPlayers[index];
+    setPlayers(newPlayers);
+    toast.success("Joueur supprimé de l'équipe !", {
+      duration: 3000,
+      position: "top-right",
+      style: {
+        background: "#EF4444",
+        color: "#fff",
+      },
+    });
   };
 
   // Gère la soumission du formulaire de joueur
@@ -307,6 +344,11 @@ function App() {
           name: selectedTeam.name,
           formation_id: selectedFormation?.id,
         });
+        setSelectedTeam({
+          ...selectedTeam,
+          name: selectedTeam.name,
+          formation_id: selectedFormation?.id,
+        });
 
         // Mettre à jour les joueurs de l'équipe
         if (Object.keys(players).length > 0) {
@@ -326,6 +368,7 @@ function App() {
           },
         });
         console.log("Équipe mise à jour");
+        // reload(selectedTeam);
       } else {
         // Créer une nouvelle équipe
         const newTeam = await teamAPI.create({
@@ -413,13 +456,12 @@ function App() {
             />
 
             {/* Section Formations et Joueurs */}
-            <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md pr-14 pl-14">
+            <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
               <FormationsSection
                 formations={formations}
                 selectedFormation={selectedFormation}
                 onFormationSelect={(formation) => {
                   setSelectedFormation(formation);
-                  setPlayers({});
                 }}
               />
               <PlayersList
@@ -427,18 +469,22 @@ function App() {
                 selectedTeam={selectedTeam}
                 selectedFormation={selectedFormation}
                 onPlayerClick={openModal}
+                onRemovePlayer={removePlayer}
                 onSaveTeam={handleSaveTeam}
               />
             </div>
           </div>
           {/* Colonne droite - Terrain */}
-          <div className="w-1/2 p-6">
+          <div className="w-1/2 p-6 flex flex-col p-6 gap-6">
             {selectedTeam ? (
-              <FootballField
-                selectedFormation={selectedFormation}
-                players={players}
-                onPlayerClick={openModal}
-              />
+              <>
+                <FootballField
+                  selectedFormation={selectedFormation}
+                  players={players}
+                  onPlayerClick={openModal}
+                />
+                <SubstitutesSection subs={subs || {}} />
+              </>
             ) : (
               <div className="text-gray-400 text-sm text-center py-8">
                 Sélectionnez une équipe
