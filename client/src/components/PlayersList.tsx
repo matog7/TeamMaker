@@ -34,11 +34,10 @@ const PlayersList: React.FC<PlayersListProps> = ({
           return (
             <div
               key={idx}
-              className={`group bg-gray-50/10 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative ${
-                players[idx]?.is_captain
-                  ? "border-orange-300/20 bg-orange-500/10"
-                  : "border-gray-200/20"
-              }`}
+              className={`group bg-gray-50/10 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative ${players[idx]?.is_captain
+                ? "border-orange-300/20 bg-orange-500/10"
+                : "border-gray-200/20"
+                }`}
               onClick={() => onPlayerClick(idx)}
             >
               <div className="flex flex-row items-center gap-3">
@@ -57,6 +56,9 @@ const PlayersList: React.FC<PlayersListProps> = ({
                       .toUpperCase()}
                   </div>
                 )}
+                <div className="absolute text-xs font-bold text-[#79eea5]/20 top-0 left-1 items-center justify-center">
+                  #{idx + 1}
+                </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold text-white text-sm truncate">
                     {player.name || "Joueur sans nom"}
@@ -79,41 +81,39 @@ const PlayersList: React.FC<PlayersListProps> = ({
                 <div className="flex-shrink-0">
                   <div className="flex justify-center gap-1 text-xs">
                     <span
-                      className={`px-2 py-1 rounded-full text-white font-medium ${
-                        (player.rating || 0) > 80
-                          ? "bg-green-700"
-                          : (player.rating || 0) > 70 &&
-                            (player.rating || 0) <= 80
+                      className={`px-2 py-1 rounded-full text-white font-medium ${(player.rating || 0) > 80
+                        ? "bg-green-700"
+                        : (player.rating || 0) > 70 &&
+                          (player.rating || 0) <= 80
                           ? "bg-green-500"
                           : (player.rating || 0) > 65 &&
-                            (player.rating || 0) < 70
-                          ? "bg-yellow-400"
-                          : (player.rating || 0) > 60 &&
-                            (player.rating || 0) <= 65
-                          ? "bg-yellow-500"
-                          : "bg-red-500"
-                      }`}
+                            (player.rating || 0) <= 70
+                            ? "bg-yellow-400"
+                            : (player.rating || 0) > 60 &&
+                              (player.rating || 0) <= 65
+                              ? "bg-yellow-500"
+                              : "bg-red-500"
+                        }`}
                     >
                       {player.rating || 0}
                     </span>
                     <span
-                      className={`px-2 py-1 rounded-full text-white font-medium ${
-                        (player.potential || 0) >= 80
-                          ? "bg-green-700"
-                          : (player.potential || 0) >= 70 &&
-                            (player.potential || 0) < 80
+                      className={`px-2 py-1 rounded-full text-white font-medium ${(player.potential || 0) >= 80
+                        ? "bg-green-700"
+                        : (player.potential || 0) > 70 &&
+                          (player.potential || 0) <= 80
                           ? "bg-green-500"
-                          : (player.potential || 0) >= 65 &&
-                            (player.potential || 0) < 70
-                          ? "bg-yellow-400"
-                          : (player.potential || 0) >= 60 &&
-                            (player.potential || 0) < 65
-                          ? "bg-yellow-500"
-                          : (player.potential || 0) >= 50 &&
-                            (player.potential || 0) < 60
-                          ? "bg-orange-500"
-                          : "bg-red-500"
-                      }`}
+                          : (player.potential || 0) > 65 &&
+                            (player.potential || 0) <= 70
+                            ? "bg-yellow-400"
+                            : (player.potential || 0) > 60 &&
+                              (player.potential || 0) <= 65
+                              ? "bg-yellow-500"
+                              : (player.potential || 0) >= 50 &&
+                                (player.potential || 0) < 60
+                                ? "bg-orange-500"
+                                : "bg-red-500"
+                        }`}
                     >
                       {player.potential || 0}
                     </span>

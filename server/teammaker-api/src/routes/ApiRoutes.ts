@@ -57,6 +57,11 @@ router.post("/team-players/:teamId", async (req, res) => {
   const { teamId } = req.params;
   const { players } = req.body;
 
+  console.log("=== DEBUT API team-players ===");
+  console.log("teamId:", teamId);
+  console.log("players reçus:", players);
+  console.log("nombre de joueurs:", Object.keys(players).length);
+
   // **************************************************************
   // insertion des joueurs qui n'existent pas encore
   // **************************************************************
@@ -75,6 +80,12 @@ router.post("/team-players/:teamId", async (req, res) => {
   );
   console.log("playersToInsertAfterFilter", playersToInsert);
   for (const [_, player] of playersToInsert) {
+    console.log("Insertion joueur:", {
+      name: (player as Player).name,
+      position: (player as Player).position,
+      rating: (player as Player).rating,
+      potential: (player as Player).potential
+    });
     const result = await query(
       "INSERT INTO players (name, rating, potential, photo, position, age, nationality) VALUES ($1, $2, $3, $4, $5, $6, $7)",
       [
@@ -101,13 +112,28 @@ router.post("/team-players/:teamId", async (req, res) => {
     [teamId]
   );
   const existingTeamPlayersIds = existingTeamPlayers.rows.map(
-    (player) => player.id
+    (player) => player.player_id
   );
-  const teamPlayersToInsert = Object.entries(players).filter(
-    ([_, player]) =>
-      !existingTeamPlayersIds.includes((player as Player).id) &&
-      (player as Player).name !== ""
-  );
+  // Pour chaque joueur, vérifier s'il existe déjà dans l'équipe
+  const teamPlayersToInsert: [string, Player][] = [];
+  for (const [positionIndex, playerValue] of Object.entries(players)) {
+    const player = playerValue as Player;
+    if (player.name === "") continue;
+
+    // Récupérer l'ID réel du joueur en base
+    const playerInDb = await query(
+      "SELECT id FROM players WHERE name = $1 LIMIT 1",
+      [player.name]
+    );
+
+    if (playerInDb.rows.length > 0) {
+      const realPlayerId = playerInDb.rows[0].id;
+      // Vérifier si ce joueur n'est pas déjà dans l'équipe
+      if (!existingTeamPlayersIds.includes(realPlayerId)) {
+        teamPlayersToInsert.push([positionIndex, player as Player]);
+      }
+    }
+  }
 
   console.log("teamPlayersToInsert", teamPlayersToInsert);
   console.log("existingTeamPlayersIds", existingTeamPlayersIds);
@@ -116,17 +142,13 @@ router.post("/team-players/:teamId", async (req, res) => {
 
   // insertion des joueurs dans l'équipe
   for (const [positionIndex, playerValue] of teamPlayersToInsert) {
-    const player = playerValue as {
-      id: number;
-      is_captain?: boolean;
-      name: string;
-    };
+    const player = playerValue as Player;
     const playerId = await query(
       "SELECT id FROM players WHERE name = $1 LIMIT 1",
       [player.name]
     );
     console.log("player", playerId?.rows[0]);
-    console.log("positionIndex", parseInt(positionIndex + 1));
+    console.log("positionIndex", parseInt(positionIndex));
     console.log("is_captain", player.is_captain || false);
     console.log("teamId", teamId);
     try {
@@ -144,6 +166,7 @@ router.post("/team-players/:teamId", async (req, res) => {
       throw error;
     }
   }
+  console.log("=== FIN API team-players ===");
   console.log("team_players inserted");
   res.json({ message: "team_players inserted" });
 });

@@ -38,6 +38,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
   onClose,
   playerPosition,
   onSubmit,
+  editingIndex,
   handlePlayerUpdate,
 }) => {
   const [form, setForm] = useState({
@@ -88,7 +89,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
         photo: player.photo || "",
         age: player.age?.toString() || "",
         nationality: player.nationality || "",
-        position: playerPosition?.position_type || "",
+        position: playerPosition?.position_type || player?.position || "",
       });
       setNationalitySearch(player.nationality || "");
     } else if (isOpen) {
@@ -217,6 +218,26 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
               required
             />
           </div>
+          {editingIndex && editingIndex > 10 && (
+            <div className="relative w-full" ref={nationalityDropdownRef}>
+              <label className="block text-sm font-medium text-white">
+                Position
+              </label>
+              <select
+                className="w-full border-b rounded border-gray-300/50 px-2 py-1 text-green-300 focus:border-[#03af62] focus:outline-none focus:bg-green-300/10"
+                value={form.position}
+                onChange={(e) => setForm((f) => ({ ...f, position: e.target.value }))}
+                required
+              >
+
+                <option value="GK" className="text-[#79eea5] bg-green-300/10">GK</option>
+                <option value="DEF" className="text-[#79eea5]">DEF</option>
+                <option value="MID" className="text-[#79eea5]">MID</option>
+                <option value="ATT" className="text-[#79eea5]">ATT</option>
+              </select>
+
+            </div>
+          )}
           <div className="relative w-full" ref={nationalityDropdownRef}>
             <label className="block text-sm font-medium text-white">
               Nationalité
@@ -311,7 +332,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
             </div>
           </div>
 
-          {player?.name === "" ? (
+          {!player?.name ? (
             <button type="submit">Valider</button>
           ) : (
             <button

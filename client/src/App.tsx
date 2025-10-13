@@ -223,19 +223,38 @@ function App() {
   }) => {
     if (editingIndex === null) return;
     console.log("playerData", playerData, editingIndex);
-    setPlayers({
-      ...players,
-      [editingIndex]: {
-        id: editingIndex,
-        name: playerData.name,
-        rating: Number(playerData.rating),
-        potential: Number(playerData.potential),
-        photo: playerData.photo,
-        age: Number(playerData.age),
-        nationality: playerData.nationality,
-        position: playerData.position,
-      } as Player,
+
+    const newPlayer = {
+      id: editingIndex,
+      name: playerData.name,
+      rating: Number(playerData.rating),
+      potential: Number(playerData.potential),
+      photo: playerData.photo,
+      age: Number(playerData.age),
+      nationality: playerData.nationality,
+      position: playerData.position,
+    } as Player;
+
+    console.log("Nouveau joueur créé:", {
+      editingIndex,
+      position: playerData.position,
+      isSubstitute: editingIndex > 10
     });
+
+    // Si c'est un remplaçant (index > 10), l'ajouter aux remplaçants
+    if (editingIndex > 10) {
+      // Pour les remplaçants, utiliser l'index original comme clé
+      setSubs({
+        ...subs,
+        [editingIndex]: newPlayer,
+      });
+    } else {
+      // Sinon, l'ajouter aux joueurs titulaires
+      setPlayers({
+        ...players,
+        [editingIndex]: newPlayer,
+      });
+    }
     closeModal();
   };
 
@@ -350,13 +369,21 @@ function App() {
           formation_id: selectedFormation?.id,
         });
 
-        // Mettre à jour les joueurs de l'équipe
-        if (Object.keys(players).length > 0) {
-          console.log(
-            "Mettre à jour l'équipe existante avec les joueurs",
-            players
-          );
-          await teamAPI.createWithPlayers(selectedTeam.id, players);
+        // Mettre à jour les joueurs de l'équipe (titulaires + remplaçants)
+        // Ajouter les remplaçants à la suite des titulaires avec des indices séquentiels
+        const allPlayers = { ...players };
+        let nextIndex = Object.keys(players).length;
+        Object.values(subs).forEach((player) => {
+          allPlayers[nextIndex] = player;
+          nextIndex++;
+        });
+        if (Object.keys(allPlayers).length > 0) {
+          console.log("=== ENVOI VERS API ===");
+          console.log("players (titulaires):", players);
+          console.log("subs (remplaçants):", subs);
+          console.log("allPlayers (fusionnés):", allPlayers);
+          console.log("nombre total de joueurs:", Object.keys(allPlayers).length);
+          await teamAPI.createWithPlayers(selectedTeam.id, allPlayers);
         }
 
         toast.success("Équipe mise à jour avec succès !", {
@@ -377,7 +404,14 @@ function App() {
         });
         console.log("Nouvelle équipe créée:", newTeam);
         setSelectedTeam(newTeam);
-        await teamAPI.createWithPlayers(newTeam.id, players);
+        // Ajouter les remplaçants à la suite des titulaires avec des indices séquentiels
+        const allPlayers = { ...players };
+        let nextIndex = Object.keys(players).length;
+        Object.values(subs).forEach((player) => {
+          allPlayers[nextIndex] = player;
+          nextIndex++;
+        });
+        await teamAPI.createWithPlayers(newTeam.id, allPlayers);
         // Recharger la liste des équipes
         const teamsList = await teamAPI.getAll();
         setTeams(teamsList);
@@ -483,7 +517,12 @@ function App() {
                   players={players}
                   onPlayerClick={openModal}
                 />
-                <SubstitutesSection subs={subs || {}} />
+                <SubstitutesSection
+                  subs={subs || {}}
+                  nbOfPlayers={Object.keys(players).length}
+                  onAddSubstitute={openModal}
+                  onPlayerClick={openModal}
+                />
               </>
             ) : (
               <div className="text-gray-400 text-sm text-center py-8">
@@ -498,7 +537,11 @@ function App() {
       <PlayerModal
         isOpen={modalOpen}
         editingIndex={editingIndex}
-        player={editingIndex !== null ? players[editingIndex] : null}
+        player={
+          editingIndex !== null
+            ? (editingIndex > 10 ? subs[editingIndex] : players[editingIndex])
+            : null
+        }
         playerPosition={
           editingIndex !== null
             ? selectedFormation?.positions[editingIndex]
