@@ -74,18 +74,17 @@ const FootballField: React.FC<FootballFieldProps> = ({
                     )}
                   </div>
                   <div
-                    className={`absolute -top-2  transform -translate-x-1/2 text-xs font-bold ${
-                      players[index].rating && players[index].rating > 70
-                        ? "bg-green-600"
-                        : players[index].rating && players[index].rating > 60
+                    className={`absolute -top-2  transform -translate-x-1/2 text-xs font-bold ${players[index].rating && players[index].rating > 70
+                      ? "bg-green-600"
+                      : players[index].rating && players[index].rating > 60
                         ? "bg-yellow-500"
                         : "bg-red-500"
-                    } text-white rounded-full px-2 py-1 border-2 border-gray-200/50 shadow-md `}
+                      } text-white rounded-full px-2 py-1 border-2 border-gray-200/50 shadow-md `}
                   >
                     {players[index].rating}
                   </div>
                   {players[index].is_captain && (
-                    <div className="absolute -bottom-[-25px] right-2 transform -translate-x-1/2 text-xs font-bold bg-orange-500 text-white rounded-full px-1 py-1 border-2 border-gray-200/50 shadow-md">
+                    <div className="absolute -bottom-[-25px] right-0 transform -translate-x-1/2 text-xs font-bold bg-orange-500 text-white rounded-full px-1 py-1 border-2 border-gray-200/50 shadow-md">
                       C
                     </div>
                   )}

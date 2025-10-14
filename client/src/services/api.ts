@@ -7,7 +7,10 @@ import type {
   PlayerSearchCriteria,
   TeamUpdate,
   Player,
+  PlayerUpdate,
   PlayerUpdateSend,
+  PlayerStats,
+  CompetitionCreate,
 } from "../interfaces";
 import { API_CONFIG } from "../config/configApi";
 
@@ -132,6 +135,68 @@ export const teamAPI = {
   // Supprimer une équipe
   delete: async (id: number) => {
     const response = await api.delete(`/teams/${id}`);
+    return response.data;
+  },
+};
+
+// API des statistiques des joueurs
+export const playerStatsAPI = {
+  // Sauvegarder les statistiques d'un joueur
+  saveStats: async (playerId: number, stats: Partial<PlayerStats>) => {
+    const response = await api.post(`/player-stats/one/${playerId}`, stats);
+    return response.data;
+  },
+
+  // Récupérer les statistiques d'un joueur
+  getStats: async (playerId: number, competitionId?: number) => {
+    const params = competitionId ? { competition_id: competitionId } : {};
+    const response = await api.get(`/player-stats/${playerId}`, { params });
+    return response.data;
+  },
+
+  getAllStats: async (players: Record<number, PlayerUpdate>, competitionId?: number) => {
+    // Extraire les IDs des joueurs
+    const playerIds = Object.values(players)
+      .map(player => player.player_id || player.id)
+      .filter(id => id && id !== 0);
+
+    console.log("IDs des joueurs à récupérer:", playerIds);
+
+    const response = await api.get("/player-stats", {
+      params: { players: playerIds.join(','), competition_id: competitionId }
+    });
+    return response.data;
+  },
+
+  // Mettre à jour les statistiques d'un joueur
+  updateStats: async (playerId: number, stats: Partial<PlayerStats>) => {
+    const response = await api.put(`/player-stats/${playerId}`, stats);
+    return response.data;
+  },
+
+  // Sauvegarder les statistiques de plusieurs joueurs
+  saveMultipleStats: async (statsArray: PlayerStats[]) => {
+    const response = await api.post("/player-stats/bulk", { stats: statsArray });
+    return response.data;
+  },
+};
+
+
+// API des compétitions
+export const competitionAPI = {
+  // Créer une compétition
+  create: async (competition: CompetitionCreate) => {
+    const response = await api.post("/competitions", competition);
+    return response.data;
+  },
+
+  getAll: async () => {
+    const response = await api.get("/competitions");
+    return response.data;
+  },
+
+  getById: async (id: number) => {
+    const response = await api.get(`/competitions/${id}`);
     return response.data;
   },
 };

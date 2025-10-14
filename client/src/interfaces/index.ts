@@ -5,6 +5,7 @@ export type {
   PlayerUpdate,
   PlayerUpdateSend,
   PlayerSearchCriteria,
+  PlayerStats,
 } from "./player";
 
 export type {
@@ -29,6 +30,12 @@ export type {
   TeamWithPlayers,
   TeamStats,
 } from "./team";
+
+export type {
+  Competition,
+  CompetitionCreate,
+  CompetitionUpdate,
+} from "./competition";
 
 // Types utilitaires
 export interface ApiResponse<T> {

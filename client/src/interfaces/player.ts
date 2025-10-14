@@ -58,3 +58,12 @@ export interface PlayerSearchCriteria {
   maxAge?: number;
   nationality?: string;
 }
+
+export interface PlayerStats {
+  competition_id?: number;
+  team_id?: number;
+  player_id: number;
+  matches_played?: number;
+  goals?: number;
+  assists?: number;
+}

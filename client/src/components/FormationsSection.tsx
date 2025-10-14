@@ -20,11 +20,10 @@ const FormationsSection: React.FC<FormationsSectionProps> = ({
           <button
             key={formation.id}
             onClick={() => onFormationSelect(formation)}
-            className={`p-3 rounded-lg border text-sm font-medium transition-all duration-200 ${
-              selectedFormation?.id === formation.id
-                ? "isHighlighted"
-                : "notHighlighted"
-            }`}
+            className={`p-3 rounded-lg border text-sm font-medium transition-all duration-200 ${selectedFormation?.id === formation.id
+              ? "isHighlighted"
+              : "notHighlighted"
+              }`}
           >
             {formation.name}
           </button>

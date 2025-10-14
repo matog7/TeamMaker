@@ -14,8 +14,8 @@ interface SubstitutesSectionProps {
 const SubstitutesSection: React.FC<SubstitutesSectionProps> = ({ subs, nbOfPlayers, onAddSubstitute, onPlayerClick }) => {
   return (
     <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
-      <div className="flex flex-row items-center justify-between">
-        <h2 className="text-lg text-left font-semibold text-white mb-4">
+      <div className="flex flex-row items-center justify-between mb-4">
+        <h2 className="text-lg text-left font-semibold text-white">
           Remplaçants
         </h2>
         <button

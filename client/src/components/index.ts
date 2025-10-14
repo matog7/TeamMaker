@@ -6,3 +6,6 @@ export { default as FootballField } from "./FootballField";
 export { default as PlayerModal } from "./PlayerModal";
 export { default as NewTeamModal } from "./NewTeamModal";
 export { default as UpdateTeamModal } from "./UpdateTeamModal";
+export { default as PlayerStatsTable } from "./PlayerStatsTable";
+export { default as CompetitionSelector } from "./CompetitionSelector";
+export { default as NewCompetitionModal } from "./NewCompetitionModal";

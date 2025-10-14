@@ -6,8 +6,11 @@ import type {
   Team,
   TeamPlayer,
   PlayerUpdate,
+  PlayerStats,
+  Competition,
+  CompetitionCreate,
 } from "./interfaces";
-import { formationAPI, playerAPI, teamAPI } from "./services/api";
+import { competitionAPI, formationAPI, playerAPI, teamAPI } from "./services/api";
 import { ERROR_MESSAGES } from "./config/configApi";
 import toast, { Toaster } from "react-hot-toast";
 import {
@@ -19,8 +22,12 @@ import {
   PlayerModal,
   NewTeamModal,
   UpdateTeamModal,
+  PlayerStatsTable,
+  CompetitionSelector,
+  NewCompetitionModal,
 } from "./components";
 import SubstitutesSection from "./components/SubstitutesSection";
+import { FileChartColumn, Users } from "lucide-react";
 
 function App() {
   const [formations, setFormations] = useState<FormationWithPositions[]>([]);
@@ -34,10 +41,41 @@ function App() {
   const [subs, setSubs] = useState<Record<number, Player>>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [onglet, setOnglet] = useState<"equipe" | "stats" | "evos">("equipe");
 
   // États pour les modales
   const [newTeamModalOpen, setNewTeamModalOpen] = useState(false);
   const [updateTeamModalOpen, setUpdateTeamModalOpen] = useState(false);
+  const [newCompetitionModalOpen, setNewCompetitionModalOpen] = useState(false);
+
+  // États pour les compétitions
+  const [competitions, setCompetitions] = useState<Competition[]>([
+    {
+      id: 1,
+      name: "Ligue 1",
+      season: "2023-2024",
+      type: "league",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 2,
+      name: "Coupe de France",
+      season: "2023-2024",
+      type: "cup",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    {
+      id: 3,
+      name: "Ligue des Champions",
+      season: "2023-2024",
+      type: "championship",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+  ]);
+  const [selectedCompetition, setSelectedCompetition] = useState<Competition | null>(null);
 
   // Récupération des formations et des positions
   useEffect(() => {
@@ -68,6 +106,16 @@ function App() {
     };
 
     fetchFormations();
+  }, []);
+
+  // Récupération des compétitions
+  useEffect(() => {
+    const fetchCompetitions = async () => {
+      const competitionsList = await competitionAPI.getAll();
+      setCompetitions(competitionsList);
+
+    };
+    fetchCompetitions();
   }, []);
 
   // Récupération des équipes
@@ -354,6 +402,50 @@ function App() {
     setUpdateTeamModalOpen(false);
   };
 
+  // Gère la mise à jour des statistiques d'un joueur
+  const handleStatsUpdate = (playerId: number, stats: Partial<PlayerStats>) => {
+    console.log("Mise à jour des stats pour le joueur", playerId, stats);
+    // Ici vous pouvez ajouter la logique pour sauvegarder en base de données
+    // Pour l'instant, on affiche juste un toast
+    toast.success(`Statistiques mises à jour pour le joueur ${playerId}`, {
+      duration: 2000,
+      position: "top-right",
+      style: {
+        background: "#10B981",
+        color: "#fff",
+      },
+    });
+  };
+
+  // Gère la création d'une nouvelle compétition
+  const handleCreateCompetition = async (competitionData: CompetitionCreate) => {
+    const newCompetition: Competition = {
+      id: Date.now(), // ID temporaire
+      ...competitionData,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    await competitionAPI.create(newCompetition);
+
+    setCompetitions(prev => [...prev, newCompetition]);
+    setSelectedCompetition(newCompetition);
+
+    toast.success("Compétition créée avec succès !", {
+      duration: 2000,
+      position: "top-right",
+      style: {
+        background: "#10B981",
+        color: "#fff",
+      },
+    });
+  };
+
+  // Ferme la modale de nouvelle compétition
+  const closeNewCompetitionModal = () => {
+    setNewCompetitionModalOpen(false);
+  };
+
   // Gère la sauvegarde de l'équipe
   const handleSaveTeam = async () => {
     try {
@@ -471,67 +563,123 @@ function App() {
   return (
     <div className="flex flex-col">
       <Header />
-      <div className="flex-1 flex overflow-hidden">
-        <div className="w-full flex">
-          {/* Colonne gauche - Dashboard */}
-          <div className="w-1/2 flex flex-col p-6 gap-6">
-            {/* Section Équipes */}
-            <TeamsSection
-              teams={teams}
-              selectedTeam={selectedTeam}
-              onTeamSelect={setSelectedTeam}
-              onNewTeamClick={openNewTeamModal}
-              onUpdateTeamClick={openUpdateTeamModal}
-              onDeselectTeam={() => {
-                setSelectedTeam(null);
-                setPlayers({});
-                setSelectedFormation(null);
-              }}
-            />
-
-            {/* Section Formations et Joueurs */}
-            <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
-              <FormationsSection
-                formations={formations}
-                selectedFormation={selectedFormation}
-                onFormationSelect={(formation) => {
-                  setSelectedFormation(formation);
+      {selectedTeam && (
+        <div className="flex justify-center items-center gap-4">
+          <span onClick={() => setOnglet("equipe")} className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${onglet === "equipe" ? "bg-green-300/10 text-green-300" : ""}`}>
+            <Users className={`w-4 h-4 ${onglet === "equipe" ? "text-green-300" : ""}`} />
+            <p className={`${onglet === "equipe" ? "text-green-300" : ""}`}>Equipe</p>
+          </span>
+          <span onClick={() => setOnglet("stats")} className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${onglet === "stats" ? "bg-green-300/10 text-green-300" : ""}`}>
+            <FileChartColumn className={`w-4 h-4 ${onglet === "stats" ? "text-green-300" : ""}`} />
+            <p className={`${onglet === "stats" ? "text-green-300" : ""}`}>Stats</p>
+          </span>
+          <span onClick={() => setOnglet("evos")} className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${onglet === "evos" ? "bg-green-300/10 text-green-300" : ""}`}>
+            <FileChartColumn className={`w-4 h-4 ${onglet === "evos" ? "text-green-300" : ""}`} />
+            <p className={`${onglet === "evos" ? "text-green-300" : ""}`}>Evolution</p>
+          </span>
+        </div>
+      )}
+      {onglet === "equipe" && (
+        <div className="flex-1 flex overflow-hidden">
+          <div className="w-full flex">
+            {/* Colonne gauche - Dashboard */}
+            <div className="w-1/2 flex flex-col p-6 gap-6">
+              {/* Section Équipes */}
+              <TeamsSection
+                teams={teams}
+                selectedTeam={selectedTeam}
+                onTeamSelect={setSelectedTeam}
+                onNewTeamClick={openNewTeamModal}
+                onUpdateTeamClick={openUpdateTeamModal}
+                onDeselectTeam={() => {
+                  setSelectedTeam(null);
+                  setPlayers({});
+                  setSelectedFormation(null);
                 }}
               />
-              <PlayersList
-                players={players}
-                selectedTeam={selectedTeam}
-                selectedFormation={selectedFormation}
-                onPlayerClick={openModal}
-                onRemovePlayer={removePlayer}
-                onSaveTeam={handleSaveTeam}
-              />
+
+              <div className="bg-green-300/10 max-h-[325px] rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
+                <FormationsSection
+                  formations={formations}
+                  selectedFormation={selectedFormation}
+                  onFormationSelect={(formation) => {
+                    setSelectedFormation(formation);
+                  }}
+                />
+              </div>
+
+              {/* Section Formations et Joueurs */}
+              <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
+                <PlayersList
+                  players={players}
+                  selectedTeam={selectedTeam}
+                  selectedFormation={selectedFormation}
+                  onPlayerClick={openModal}
+                  onRemovePlayer={removePlayer}
+                  onSaveTeam={handleSaveTeam}
+                />
+              </div>
+              {/* Section Formations et Joueurs */}
+              <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
+                <div>Transfert</div>
+                <span className="text-gray-400 text-sm mt-6">Aucun transfert</span>
+              </div>
+            </div>
+            {/* Colonne droite - Terrain */}
+            <div className="w-1/2 p-6 flex flex-col p-6 gap-6">
+              {selectedTeam ? (
+                <>
+                  <FootballField
+                    selectedFormation={selectedFormation}
+                    players={players}
+                    onPlayerClick={openModal}
+                  />
+                  <SubstitutesSection
+                    subs={subs || {}}
+                    nbOfPlayers={Object.keys(players).length}
+                    onAddSubstitute={openModal}
+                    onPlayerClick={openModal}
+                  />
+                </>
+              ) : (
+                <div className="text-gray-400 text-sm text-center py-8">
+                  Sélectionnez une équipe
+                </div>
+              )}
             </div>
           </div>
-          {/* Colonne droite - Terrain */}
-          <div className="w-1/2 p-6 flex flex-col p-6 gap-6">
-            {selectedTeam ? (
-              <>
-                <FootballField
-                  selectedFormation={selectedFormation}
-                  players={players}
-                  onPlayerClick={openModal}
+        </div>)}
+      {onglet === "stats" && (
+        <div className="flex-1 flex overflow-hidden">
+          <div className="w-full flex">
+            {/* Colonne gauche - Sélecteur de compétition */}
+            <div className="w-1/3 p-6">
+              <CompetitionSelector
+                competitions={competitions}
+                selectedCompetition={selectedCompetition}
+                onCompetitionSelect={setSelectedCompetition}
+                onNewCompetition={() => setNewCompetitionModalOpen(true)}
+              />
+            </div>
+
+            {/* Colonne droite - Tableau de statistiques */}
+            <div className="w-2/3 p-6">
+              {selectedTeam ? (
+                <PlayerStatsTable
+                  players={players as Record<number, PlayerUpdate>}
+                  subs={subs as Record<number, PlayerUpdate>}
+                  selectedCompetition={selectedCompetition}
+                  onStatsUpdate={handleStatsUpdate}
                 />
-                <SubstitutesSection
-                  subs={subs || {}}
-                  nbOfPlayers={Object.keys(players).length}
-                  onAddSubstitute={openModal}
-                  onPlayerClick={openModal}
-                />
-              </>
-            ) : (
-              <div className="text-gray-400 text-sm text-center py-8">
-                Sélectionnez une équipe
-              </div>
-            )}
+              ) : (
+                <div className="text-gray-400 text-sm text-center py-8">
+                  Sélectionnez une équipe pour voir les statistiques
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Modales */}
       <PlayerModal
@@ -566,6 +714,12 @@ function App() {
         formations={formations}
         onClose={() => setUpdateTeamModalOpen(false)}
         onSubmit={handleUpdateTeam}
+      />
+
+      <NewCompetitionModal
+        isOpen={newCompetitionModalOpen}
+        onClose={closeNewCompetitionModal}
+        onSubmit={handleCreateCompetition}
       />
 
       {/* Composant Toaster pour les notifications */}

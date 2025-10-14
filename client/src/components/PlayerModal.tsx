@@ -244,7 +244,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
             </label>
             <input
               type="text"
-              className="w-full border-b rounded border-gray-300/50 px-2 py-1 text-gray-300 focus:border-[#03af62] focus:outline-none"
+              className="w-full border-b rounded border-gray-300/50 px-2 py-1 text-green-300 focus:border-[#03af62] focus:outline-none"
               placeholder="Rechercher une nationalité..."
               value={nationalitySearch}
               onChange={(e) => handleNationalitySearch(e.target.value)}
@@ -303,7 +303,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
                   className="mx-auto h-20 w-20 object-cover rounded-full "
                 />
               ) : (
-                <div className="flex flex-col items-center justify-center">
+                <div className="flex flex-col items-center justify-center mt-4">
                   <MonitorUp className="w-4 h-4 text-gray-300 mb-2" />
                   <span className="text-gray-300 text-sm">
                     Glissez une image ici ou cliquez pour choisir un fichier
