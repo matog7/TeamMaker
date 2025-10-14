@@ -1,7 +1,12 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import apiRoutes from "./routes/ApiRoutes";
+import CompetitionsRoutes from "./routes/CompetitionsRoutes";
+import FormationsRoutes from "./routes/FormationsRoutes";
+import TeamsRoutes from "./routes/TeamsRoutes";
+import TeamPlayersRoutes from "./routes/TeamPlayersRoutes";
+import PlayerStatsRoutes from "./routes/PlayerStatsRoutes";
+import PlayersRoutes from "./routes/PlayersRoutes";
 
 dotenv.config();
 
@@ -24,7 +29,12 @@ app.use(express.json());
 
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
-app.use("/api", apiRoutes);
+app.use("/api", CompetitionsRoutes);
+app.use("/api", FormationsRoutes);
+app.use("/api", TeamsRoutes);
+app.use("/api", TeamPlayersRoutes);
+app.use("/api", PlayerStatsRoutes);
+app.use("/api", PlayersRoutes);
 
 const port = Number(process.env.PORT || 3000);
 app.listen(port, () => {
