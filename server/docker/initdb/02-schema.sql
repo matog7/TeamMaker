@@ -102,6 +102,24 @@ CREATE TABLE IF NOT EXISTS player_stats (
     )
 );
 
+-- Table des transferts
+CREATE TABLE IF NOT EXISTS transfers (
+    id SERIAL PRIMARY KEY,
+    player_id INTEGER REFERENCES players (id) ON DELETE CASCADE,
+    status VARCHAR(100) NOT NULL CHECK (
+        status IN (
+            'vendu',
+            'prete',
+            'liste_suivi',
+            'liste_attente',
+            'achete'
+        )
+    ),
+    price VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Index pour améliorer les performances
 CREATE INDEX IF NOT EXISTS idx_players_position ON players (position);
 

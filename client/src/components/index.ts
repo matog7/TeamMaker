@@ -9,3 +9,5 @@ export { default as UpdateTeamModal } from "./UpdateTeamModal";
 export { default as PlayerStatsTable } from "./PlayerStatsTable";
 export { default as CompetitionSelector } from "./CompetitionSelector";
 export { default as NewCompetitionModal } from "./NewCompetitionModal";
+export { default as TransfertsList } from "./TransfertsList";
+export { default as NewTransfertModal } from "./NewTransfertModal";

@@ -9,6 +9,8 @@ import type {
   PlayerStats,
   Competition,
   CompetitionCreate,
+  Transfert,
+  TransfertCreate,
 } from "./interfaces";
 import { competitionAPI, formationAPI, playerAPI, teamAPI } from "./services/api";
 import { ERROR_MESSAGES } from "./config/configApi";
@@ -25,21 +27,29 @@ import {
   PlayerStatsTable,
   CompetitionSelector,
   NewCompetitionModal,
+  TransfertsList,
 } from "./components";
 import SubstitutesSection from "./components/SubstitutesSection";
 import { FileChartColumn, Users } from "lucide-react";
 
 function App() {
+  // États pour les formations et les équipes
   const [formations, setFormations] = useState<FormationWithPositions[]>([]);
   const [selectedFormation, setSelectedFormation] =
     useState<FormationWithPositions | null>(null);
   const [teams, setTeams] = useState<Team[]>([]);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+
+  // États pour les erreurs
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // États pour les joueurs
   const [players, setPlayers] = useState<Record<number, Player>>({});
   const [subs, setSubs] = useState<Record<number, Player>>({});
   const [modalOpen, setModalOpen] = useState(false);
+
+  // États pour les editions
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [onglet, setOnglet] = useState<"equipe" | "stats" | "evos">("equipe");
 
@@ -49,186 +59,153 @@ function App() {
   const [newCompetitionModalOpen, setNewCompetitionModalOpen] = useState(false);
 
   // États pour les compétitions
-  const [competitions, setCompetitions] = useState<Competition[]>([
-    {
-      id: 1,
-      name: "Ligue 1",
-      season: "2023-2024",
-      type: "league",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    {
-      id: 2,
-      name: "Coupe de France",
-      season: "2023-2024",
-      type: "cup",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    {
-      id: 3,
-      name: "Ligue des Champions",
-      season: "2023-2024",
-      type: "championship",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-  ]);
+  const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [selectedCompetition, setSelectedCompetition] = useState<Competition | null>(null);
 
+  // États pour les transferts
+  const [transferts, setTransferts] = useState<Transfert[]>([]);
+
   // Récupération des formations et des positions
-  useEffect(() => {
-    const fetchFormations = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        // Récupérer toutes les formations
-        const formationsList = await formationAPI.getAll();
+  const fetchFormations = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      // Récupérer toutes les formations
+      const formationsList = await formationAPI.getAll();
 
-        // Pour chaque formation, récupérer ses positions
-        const formationsWithPositions = await Promise.all(
-          formationsList.map(async (formation: Formation) => {
-            const positions = await formationAPI.getPositions(formation.id);
-            return {
-              ...formation,
-              positions,
-            } as FormationWithPositions;
-          })
-        );
-        setFormations(formationsWithPositions);
-      } catch (err) {
-        console.error("Erreur lors du chargement des formations:", err);
-        setError(ERROR_MESSAGES.FORMATIONS_LOAD_ERROR);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFormations();
-  }, []);
+      // Pour chaque formation, récupérer ses positions
+      const formationsWithPositions = await Promise.all(
+        formationsList.map(async (formation: Formation) => {
+          const positions = await formationAPI.getPositions(formation.id);
+          return {
+            ...formation,
+            positions,
+          } as FormationWithPositions;
+        })
+      );
+      setFormations(formationsWithPositions);
+    } catch (err) {
+      console.error("Erreur lors du chargement des formations:", err);
+      setError(ERROR_MESSAGES.FORMATIONS_LOAD_ERROR);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Récupération des compétitions
-  useEffect(() => {
-    const fetchCompetitions = async () => {
-      const competitionsList = await competitionAPI.getAll();
-      setCompetitions(competitionsList);
+  const fetchCompetitions = async () => {
+    const competitionsList = await competitionAPI.getAll();
+    setCompetitions(competitionsList);
+  };
 
-    };
+  // Récupération des équipes
+  const fetchTeams = async () => {
+    try {
+      const teamsList = await teamAPI.getAll();
+      setTeams(teamsList);
+    } catch (err) {
+      console.error("Erreur lors du chargement des équipes:", err);
+    }
+  };
+
+  // Récupération des joueurs d'une équipe sélectionnée
+  const fetchTeamPlayers = async () => {
+    if (selectedTeam && formations.length > 0) {
+      try {
+        const teamWithPlayers = await teamAPI.getWithPlayers(selectedTeam.id);
+        console.log("Joueurs de l'équipe chargés:", teamWithPlayers);
+        // trie des joueurs de l'équipe dans l'ordre de leur position
+        const sortedPlayers = teamWithPlayers.sort(
+          (a: TeamPlayer, b: TeamPlayer) =>
+            a.position_order - b.position_order
+        );
+        if (sortedPlayers.length > 10) {
+          const eleven = sortedPlayers.slice(0, 11);
+          const subs = sortedPlayers.slice(11);
+          console.log(
+            "sortedPlayers",
+            sortedPlayers,
+            "eleven",
+            eleven,
+            "subs",
+            subs
+          );
+
+          setPlayers(eleven);
+          setSubs(subs);
+        } else {
+          const playerList: Player[] = [];
+          for (let i = 0; i < 11; i++) {
+            const player = sortedPlayers.find(
+              (p: Player) => p.position_order === i + 1
+            );
+            if (player) {
+              playerList[i] = player;
+            } else {
+              playerList[i] = {
+                id: 0,
+                name: "",
+                is_captain: false,
+                // position: "GK",
+                created_at: "",
+                updated_at: "",
+              };
+            }
+          }
+          console.log(
+            "custom playerList de l'équipe sélectionnée",
+            playerList
+          );
+          setPlayers(playerList);
+        }
+
+        // Mettre à jour la formation sélectionnée si l'équipe en a une
+        if (teamWithPlayers.formation_id) {
+          const formation = formations.find(
+            (f) => f.id === teamWithPlayers.formation_id
+          );
+          if (formation) {
+            setSelectedFormation(formation);
+          }
+        }
+      } catch (err) {
+        console.error(
+          "Erreur lors du chargement des joueurs de l'équipe:",
+          err
+        );
+      }
+    }
+  };
+
+  // Récupération de la formation de l'équipe sélectionnée
+  const fetchFormation = async () => {
+    if (selectedTeam?.formation_id) {
+      console.log(
+        "Formation de l'équipe sélectionnée chargée:",
+        selectedTeam.formation_id
+      );
+      const formation = formations.find(
+        (f) => f.id === selectedTeam.formation_id
+      );
+      if (formation) {
+        console.log("La formation de l'équipesélectionnée est:", formation);
+        setSelectedFormation(formation);
+      }
+    }
+  };
+
+  // Récupérations au chargement de l'application
+  useEffect(() => {
+    fetchFormations();
     fetchCompetitions();
   }, []);
 
-  // Récupération des équipes
+  // Récupération lorsque l'équipe change
   useEffect(() => {
-    const fetchTeams = async () => {
-      try {
-        const teamsList = await teamAPI.getAll();
-        setTeams(teamsList);
-      } catch (err) {
-        console.error("Erreur lors du chargement des équipes:", err);
-      }
-    };
     fetchTeams();
-  }, [selectedTeam]);
-
-  // Récupération des joueurs d'une équipe sélectionnée
-  useEffect(() => {
-    const fetchTeamPlayers = async () => {
-      if (selectedTeam && formations.length > 0) {
-        try {
-          const teamWithPlayers = await teamAPI.getWithPlayers(selectedTeam.id);
-          console.log("Joueurs de l'équipe chargés:", teamWithPlayers);
-          // trie des joueurs de l'équipe dans l'ordre de leur position
-          const sortedPlayers = teamWithPlayers.sort(
-            (a: TeamPlayer, b: TeamPlayer) =>
-              a.position_order - b.position_order
-          );
-          if (sortedPlayers.length > 10) {
-            const eleven = sortedPlayers.slice(0, 11);
-            const subs = sortedPlayers.slice(11);
-            console.log(
-              "sortedPlayers",
-              sortedPlayers,
-              "eleven",
-              eleven,
-              "subs",
-              subs
-            );
-
-            setPlayers(eleven);
-            setSubs(subs);
-          } else {
-            const playerList: Player[] = [];
-            for (let i = 0; i < 11; i++) {
-              const player = sortedPlayers.find(
-                (p: Player) => p.position_order === i + 1
-              );
-              if (player) {
-                playerList[i] = player;
-              } else {
-                playerList[i] = {
-                  id: 0,
-                  name: "",
-                  is_captain: false,
-                  // position: "GK",
-                  created_at: "",
-                  updated_at: "",
-                };
-              }
-            }
-            console.log(
-              "custom playerList de l'équipe sélectionnée",
-              playerList
-            );
-            setPlayers(playerList);
-          }
-
-          // Mettre à jour la formation sélectionnée si l'équipe en a une
-          if (teamWithPlayers.formation_id) {
-            const formation = formations.find(
-              (f) => f.id === teamWithPlayers.formation_id
-            );
-            if (formation) {
-              setSelectedFormation(formation);
-            }
-          }
-        } catch (err) {
-          console.error(
-            "Erreur lors du chargement des joueurs de l'équipe:",
-            err
-          );
-        }
-      }
-    };
     fetchTeamPlayers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTeam, formations]);
-
-  // Récupération de la formation de l'équipe sélectionnée
-  useEffect(() => {
-    const fetchFormation = async () => {
-      if (selectedTeam?.formation_id) {
-        console.log(
-          "Formation de l'équipe sélectionnée chargée:",
-          selectedTeam.formation_id
-        );
-        const formation = formations.find(
-          (f) => f.id === selectedTeam.formation_id
-        );
-        if (formation) {
-          console.log("La formation de l'équipesélectionnée est:", formation);
-          setSelectedFormation(formation);
-        }
-      }
-    };
     fetchFormation();
   }, [selectedTeam, formations]);
-
-  // Recharge la page
-  const reload = (team: Team) => {
-    localStorage.setItem("team", JSON.stringify(team));
-    window.location.reload();
-  };
 
   // Ouvre la modale pour une position donnée
   const openModal = (index: number) => {
@@ -258,6 +235,10 @@ function App() {
       },
     });
   };
+
+  // ----------------
+  // --- HANDLERS ---
+  // ----------------
 
   // Gère la soumission du formulaire de joueur
   const handlePlayerSubmit = (playerData: {
@@ -530,6 +511,16 @@ function App() {
     }
   };
 
+  // Gère la création d'un nouveau transfert
+  const handleCreateTransfert = async (transfertData: TransfertCreate) => {
+    // const newTransfert = await transfertAPI.create(transfertData);
+    setTransferts(prev => [...prev, transfertData as Transfert]);
+  };
+
+  // ----------------
+  // --- ERREURS ---
+  // ----------------
+
   // Affichage de l'état de chargement
   if (loading) {
     return (
@@ -621,8 +612,11 @@ function App() {
               </div>
               {/* Section Formations et Joueurs */}
               <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
-                <div>Transfert</div>
-                <span className="text-gray-400 text-sm mt-6">Aucun transfert</span>
+                <TransfertsList
+                  transferts={transferts}
+                  players={players}
+                  onCreateTransfert={handleCreateTransfert}
+                />
               </div>
             </div>
             {/* Colonne droite - Terrain */}
@@ -640,6 +634,20 @@ function App() {
                     onAddSubstitute={openModal}
                     onPlayerClick={openModal}
                   />
+                  <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
+                    <div className="flex flex-col items-center justify-center">
+                      <p className="text-gray-400 text-sm text-left mb-2">
+                        Les contraintes pour chaque sauvegarde doivent être respectées. Les voici :
+                        L'équipe doit avoir au moins 21 joueurs, dont 10 originaires du pays de l'équipe (formation).
+                        10 achats maximum à l'achat en été, et 5 ventes maximum. 5 transferts entrants et sortants maximum en hiver.
+                        Les ajouts d'agent libre sont limités à 1 par équipe, et par saison. Lors du mercato d'hiver, les signatures de joueurs en fin de contrat sont limitées à 2 par équipe.
+
+                      </p>
+                      <p className="text-green-300 text-sm text-center mb-2">TeamMaker - v1.0.0</p>
+                      <p className="text-gray-400 text-sm text-center">Tous droits réservés.</p>
+                      <p className="text-gray-400 text-sm text-center">© 2025 - TeamMaker.</p>
+                    </div>
+                  </div>
                 </>
               ) : (
                 <div className="text-gray-400 text-sm text-center py-8">

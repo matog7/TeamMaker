@@ -37,6 +37,12 @@ export type {
   CompetitionUpdate,
 } from "./competition";
 
+export type {
+  Transfert,
+  TransfertCreate,
+  TransfertUpdate,
+} from "./transfert";
+
 // Types utilitaires
 export interface ApiResponse<T> {
   success: boolean;
