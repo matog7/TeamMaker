@@ -1,35 +1,61 @@
 import React, { useState } from "react";
 import { X, Plus } from "lucide-react";
-import type { TransfertCreate, Player } from "../interfaces";
+import type { TransfertCreate, Tag } from "../interfaces/transfert";
 
 interface NewTransfertModalProps {
     isOpen: boolean;
     onClose: () => void;
     onCreateTransfert: (transfert: TransfertCreate) => void;
-    players: Record<number, Player>;
 }
 
 const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
     isOpen,
     onClose,
-    onCreateTransfert,
-    players
+    onCreateTransfert
 }) => {
     const [formData, setFormData] = useState<TransfertCreate>({
-        player_id: 0,
+        player_name: '',
+        overall: 0,
+        potential: 0,
         status: 'liste_suivi',
-        price: ''
+        price: '',
+        send_to: '',
+        from: '',
+        tags: [],
     });
+
+    const [newTag, setNewTag] = useState({ name: '', color: '#3B82F6' });
+    const [showTagInput, setShowTagInput] = useState(false);
+
+    const predefinedColors = [
+        '#3B82F6', // Bleu
+        '#EF4444', // Rouge
+        '#10B981', // Vert
+        '#F59E0B', // Orange
+        '#8B5CF6', // Violet
+        '#EC4899', // Rose
+        '#06B6D4', // Cyan
+        '#84CC16', // Lime
+        '#F97316', // Orange foncé
+        '#6366F1', // Indigo
+    ];
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (formData.player_id && formData.price) {
+        if (formData.player_name && formData.price) {
             onCreateTransfert(formData);
             setFormData({
-                player_id: 0,
+                player_name: '',
+                overall: 0,
+                potential: 0,
                 status: 'liste_suivi',
-                price: ''
+                price: '',
+                send_to: '',
+                from: '',
+                tags: [],
             });
+            setNewTag({ name: '', color: '#3B82F6' });
+            setShowTagInput(false);
             onClose();
         }
     };
@@ -42,14 +68,43 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
         }));
     };
 
+    const addTag = () => {
+        if (newTag.name.trim() && formData.tags) {
+            const tagExists = formData.tags.some(tag => tag.name.toLowerCase() === newTag.name.toLowerCase());
+            if (!tagExists) {
+                setFormData(prev => ({
+                    ...prev,
+                    tags: [...(prev.tags || []), { ...newTag, name: newTag.name.trim() }]
+                }));
+                setNewTag({ name: '', color: '#3B82F6' });
+                setShowTagInput(false);
+            }
+        }
+    };
+
+    const removeTag = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            tags: prev.tags?.filter((_, i) => i !== index) || []
+        }));
+    };
+
+    const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setNewTag(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-green-300/10 backdrop-blur-md border-2 border-gray-500/50 rounded-lg p-6 w-full max-w-md mx-4">
                 <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-                        <Plus className="w-5 h-5 text-green-400" />
+                        <Plus className="w-5 h-5 text-green-300" />
                         Nouveau Transfert
                     </h2>
                     <button
@@ -62,25 +117,47 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-white mb-2">
                             Joueur
                         </label>
-                        <select
-                            name="player_id"
-                            value={formData.player_id}
+                        <input
+                            type="text"
+                            name="player_name"
+                            value={formData.player_name}
                             onChange={handleChange}
-                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                            placeholder="Ex: Jean Dupont..."
+                            className="w-full border-b px-2 py-1 border-gray-300/50 text-[#79eea5] focus:border-[#03af62] focus:outline-none"
                             required
-                        >
-                            <option value={0}>Sélectionner un joueur</option>
-                            {Object.values(players).map((player) => (
-                                <option key={player.id} value={player.id}>
-                                    {player.name} - {player.position} ({player.rating})
-                                </option>
-                            ))}
-                        </select>
+                        />
                     </div>
-
+                    <div>
+                        <label className="block text-sm font-medium text-white mb-2">
+                            Général
+                        </label>
+                        <input
+                            type="text"
+                            name="overall"
+                            value={formData.overall}
+                            onChange={handleChange}
+                            placeholder="Ex: 80..."
+                            className="w-full border-b px-2 py-1 border-gray-300/50 text-[#79eea5] focus:border-[#03af62] focus:outline-none"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-white mb-2">
+                            Potentiel
+                        </label>
+                        <input
+                            type="text"
+                            name="potential"
+                            value={formData.potential}
+                            onChange={handleChange}
+                            placeholder="Ex: 80..."
+                            className="w-full border-b px-2 py-1 border-gray-300/50 text-[#79eea5] focus:border-[#03af62] focus:outline-none"
+                            required
+                        />
+                    </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                             Statut
@@ -89,7 +166,7 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
                             name="status"
                             value={formData.status}
                             onChange={handleChange}
-                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="w-full px-3 py-2 bg-black/70 border border-gray-300/50 rounded-md text-[#79eea5] focus:outline-none focus:ring-1 focus:ring-green-300"
                             required
                         >
                             <option value="liste_suivi">Liste de suivi</option>
@@ -110,11 +187,123 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
                             value={formData.price}
                             onChange={handleChange}
                             placeholder="Ex: 15M€, 2.5M€, Gratuit..."
-                            className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="w-full px-2 py-1 border-b border-gray-300/50 text-[#79eea5] focus:outline-none focus:border-[#03af62]"
                             required
                         />
                     </div>
+                    {formData.status === 'vendu' && (
+                        <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Vers
+                            </label>
+                            <input
+                                type="text"
+                                name="send_to"
+                                value={formData.send_to}
+                                onChange={handleChange}
+                                placeholder="Ex: Real Madrid, Barcelona..."
+                                className="w-full px-2 py-1 border-b border-gray-300/50 text-[#79eea5] focus:outline-none focus:border-[#03af62]"
+                                required
+                            />
+                        </div>
+                    )}
 
+                    {/* Section Tags */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Tags
+                        </label>
+
+                        {/* Affichage des tags existants */}
+                        {formData.tags && formData.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mb-3">
+                                {formData.tags.map((tag, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center gap-1 px-2 py-1 rounded-full text-xs text-white"
+                                        style={{ backgroundColor: tag.color }}
+                                    >
+                                        <span>{tag.name}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeTag(index)}
+                                            className="hover:bg-black/20 rounded-full p-0.5"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Bouton pour ajouter un tag */}
+                        {!showTagInput && (
+                            <button
+                                type="button"
+                                onClick={() => setShowTagInput(true)}
+                                className="flex items-center gap-2 px-3 py-2 border border-dashed border-gray-400/50 rounded-md text-gray-300 hover:text-white hover:border-gray-300 transition-colors"
+                            >
+                                <Plus className="w-4 h-4" />
+                                Ajouter un tag
+                            </button>
+                        )}
+
+                        {/* Formulaire d'ajout de tag */}
+                        {showTagInput && (
+                            <div className="space-y-3 p-3 border border-gray-400/30 rounded-md bg-black/20">
+                                <div>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={newTag.name}
+                                        onChange={handleTagInputChange}
+                                        placeholder="Nom du tag..."
+                                        className="w-full px-2 py-1 border-b border-gray-300/50 text-[#79eea5] focus:outline-none focus:border-[#03af62]"
+                                        autoFocus
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs text-gray-400 mb-2">
+                                        Couleur
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {predefinedColors.map((color) => (
+                                            <button
+                                                key={color}
+                                                type="button"
+                                                onClick={() => setNewTag(prev => ({ ...prev, color }))}
+                                                className={`w-6 h-6 rounded-full border-2 ${newTag.color === color ? 'border-white' : 'border-gray-400'
+                                                    }`}
+                                                style={{ backgroundColor: color }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={addTag}
+                                        disabled={!newTag.name.trim()}
+                                        className="px-3 py-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
+                                    >
+                                        Ajouter
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowTagInput(false);
+                                            setNewTag({ name: '', color: '#3B82F6' });
+                                        }}
+                                        className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors"
+                                    >
+                                        Annuler
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                     <div className="flex gap-3 pt-4">
                         <button
                             type="button"

@@ -103,9 +103,13 @@ CREATE TABLE IF NOT EXISTS player_stats (
 );
 
 -- Table des transferts
-CREATE TABLE IF NOT EXISTS transfers (
+CREATE TABLE IF NOT EXISTS transferts (
     id SERIAL PRIMARY KEY,
-    player_id INTEGER REFERENCES players (id) ON DELETE CASCADE,
+    team_id INTEGER REFERENCES teams (id) ON DELETE CASCADE,
+    photo VARCHAR(255),
+    player_name VARCHAR(100) NOT NULL,
+    overall INTEGER NOT NULL,
+    potential INTEGER NOT NULL,
     status VARCHAR(100) NOT NULL CHECK (
         status IN (
             'vendu',
@@ -116,7 +120,10 @@ CREATE TABLE IF NOT EXISTS transfers (
         )
     ),
     price VARCHAR(100) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    send_to VARCHAR(100),
+    from VARCHAR(100), 
+    tags VARCHAR(100)[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -134,6 +141,8 @@ CREATE INDEX IF NOT EXISTS idx_team_players_player_id ON team_players (player_id
 CREATE INDEX IF NOT EXISTS idx_player_stats_player_id ON player_stats (player_id);
 
 CREATE INDEX IF NOT EXISTS idx_player_stats_competition_id ON player_stats (competition_id);
+
+CREATE INDEX IF NOT EXISTS idx_transferts_team_id ON transferts (team_id);
 
 -- Trigger pour mettre à jour updated_at automatiquement
 CREATE OR REPLACE FUNCTION update_updated_at_column()

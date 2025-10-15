@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import { Plus, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle } from 'lucide-react';
-import type { Transfert, Player, TransfertCreate } from '../interfaces';
+import { Plus, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, ArrowLeftRight } from 'lucide-react';
+import type { Transfert, TransfertCreate } from '../interfaces';
 import NewTransfertModal from './NewTransfertModal';
+import { getRatingColor } from '../utils/ratingColors';
 
 interface TransfertsListProps {
     transferts: Transfert[];
-    players: Record<number, Player>;
     onCreateTransfert: (transfert: TransfertCreate) => void;
 }
 
 const TransfertsList: React.FC<TransfertsListProps> = ({
     transferts,
-    players,
     onCreateTransfert
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,16 +66,11 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
         }
     };
 
-    const getPlayerName = (playerId: number) => {
-        const player = players[playerId];
-        return player ? player.name : `Joueur #${playerId}`;
-    };
-
     return (
         <div className="mb-6">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-green-400" />
+                    <ArrowLeftRight className="w-5 h-5 text-green-300" />
                     Transferts
                 </h2>
                 <button
@@ -89,7 +83,7 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
             </div>
 
             {transferts.length === 0 ? (
-                <div className="text-gray-400 text-center py-8">
+                <div className="text-gray-400 text-center text-sm py-8">
                     Aucun transfert enregistré
                 </div>
             ) : (
@@ -97,22 +91,56 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
                     {transferts.map((transfert) => (
                         <div
                             key={transfert.id}
-                            className="bg-gray-800/50 rounded-lg p-4 border border-gray-600/50"
+                            className="bg-gray-50/10 border-gray-200/20 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative"
                         >
                             <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
+                                <div className="flex flex-row items-center gap-3">
                                     {getStatusIcon(transfert.status)}
-                                    <div>
-                                        <div className="text-white font-medium">
-                                            {getPlayerName(transfert.player_id)}
+                                    <div className="flex flex-row items-center gap-3">
+                                        {transfert.photo ? (
+                                            <img
+                                                src={`/uploads/${transfert.photo}`}
+                                                alt={transfert.player_name}
+                                                className="w-10 h-10 rounded-full object-cover border border-gray-200/20"
+                                            />
+                                        ) : (
+                                            <div className="min-w-10 min-h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-500 text-sm">
+                                                {(transfert.player_name || "J")
+                                                    .split(" ")
+                                                    .map((n) => n[0])
+                                                    .join("")
+                                                    .toUpperCase()}
+                                            </div>
+                                        )}
+                                        <div className="flex flex-col items-start">
+                                            <div className="text-white font-medium">
+                                                {transfert.player_name}
+                                            </div>
+                                            <div className="text-gray-400 text-sm">
+                                                {transfert.send_to ? `Vers: ${transfert.send_to}` : transfert.from ? transfert.from : ''} {transfert.price}
+                                            </div>
                                         </div>
-                                        <div className="text-gray-400 text-sm">
-                                            {transfert.price}
+                                        <div className="flex flex-wrap gap-2">
+                                            {transfert.tags?.map((tag, index) => (
+                                                <div key={index} className="rounded-full px-2 py-1 text-xs text-white bg-white" style={{ backgroundColor: tag.color }}>
+                                                    {tag.name}
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 </div>
-                                <div className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(transfert.status)}`}>
-                                    {getStatusLabel(transfert.status)}
+                                <div className="flex flex-row items-center gap-5">
+                                    <div className="flex flex-row items-center gap-1">
+                                        <span className={`px-2 py-1 rounded-full text-white text-xs font-medium ${getRatingColor(transfert.overall)}`}>
+                                            {transfert.overall}
+                                        </span>
+                                        <span className={`px-2 py-1 rounded-full text-white text-xs font-medium ${getRatingColor(transfert.potential)}`}>
+                                            {transfert.potential}
+                                        </span>
+                                    </div>
+                                    <div className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(transfert.status)}`}>
+                                        {getStatusLabel(transfert.status)}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -124,7 +152,6 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onCreateTransfert={onCreateTransfert}
-                players={players}
             />
         </div>
     );

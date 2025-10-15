@@ -11,6 +11,7 @@ import type {
   PlayerUpdateSend,
   PlayerStats,
   CompetitionCreate,
+  TransfertCreate,
 } from "../interfaces";
 import { API_CONFIG } from "../config/configApi";
 
@@ -197,6 +198,19 @@ export const competitionAPI = {
 
   getById: async (id: number) => {
     const response = await api.get(`/competitions/${id}`);
+    return response.data;
+  },
+};
+
+export const transfertAPI = {
+
+  getAll: async (team_id: number) => {
+    const response = await api.get("/transferts", { params: { team_id } });
+    return response.data;
+  },
+
+  create: async (transfert: TransfertCreate, team_id: number) => {
+    const response = await api.post("/transferts", { ...transfert, team_id });
     return response.data;
   },
 };

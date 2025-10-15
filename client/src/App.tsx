@@ -12,7 +12,7 @@ import type {
   Transfert,
   TransfertCreate,
 } from "./interfaces";
-import { competitionAPI, formationAPI, playerAPI, teamAPI } from "./services/api";
+import { competitionAPI, formationAPI, playerAPI, teamAPI, transfertAPI } from "./services/api";
 import { ERROR_MESSAGES } from "./config/configApi";
 import toast, { Toaster } from "react-hot-toast";
 import {
@@ -30,7 +30,7 @@ import {
   TransfertsList,
 } from "./components";
 import SubstitutesSection from "./components/SubstitutesSection";
-import { FileChartColumn, Users } from "lucide-react";
+import { FileChartColumn, TrendingUp, Users } from "lucide-react";
 
 function App() {
   // États pour les formations et les équipes
@@ -103,6 +103,7 @@ function App() {
     try {
       const teamsList = await teamAPI.getAll();
       setTeams(teamsList);
+      // setSelectedTeam(teamsList[0]);
     } catch (err) {
       console.error("Erreur lors du chargement des équipes:", err);
     }
@@ -194,6 +195,13 @@ function App() {
     }
   };
 
+  // Récupération des transferts
+  const fetchTransferts = async () => {
+    const transfertsList = await transfertAPI.getAll(selectedTeam?.id as number);
+    console.log("Transferts chargés:", transfertsList);
+    setTransferts(transfertsList);
+  };
+
   // Récupérations au chargement de l'application
   useEffect(() => {
     fetchFormations();
@@ -205,6 +213,7 @@ function App() {
     fetchTeams();
     fetchTeamPlayers();
     fetchFormation();
+    fetchTransferts();
   }, [selectedTeam, formations]);
 
   // Ouvre la modale pour une position donnée
@@ -513,8 +522,16 @@ function App() {
 
   // Gère la création d'un nouveau transfert
   const handleCreateTransfert = async (transfertData: TransfertCreate) => {
-    // const newTransfert = await transfertAPI.create(transfertData);
-    setTransferts(prev => [...prev, transfertData as Transfert]);
+    const newTransfert = await transfertAPI.create(transfertData, selectedTeam?.id as number);
+    setTransferts(prev => [...prev, newTransfert]);
+    toast.success("Transfert créé avec succès !", {
+      duration: 3000,
+      position: "top-right",
+      style: {
+        background: "#10B981",
+        color: "#fff",
+      },
+    });
   };
 
   // ----------------
@@ -565,7 +582,7 @@ function App() {
             <p className={`${onglet === "stats" ? "text-green-300" : ""}`}>Stats</p>
           </span>
           <span onClick={() => setOnglet("evos")} className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${onglet === "evos" ? "bg-green-300/10 text-green-300" : ""}`}>
-            <FileChartColumn className={`w-4 h-4 ${onglet === "evos" ? "text-green-300" : ""}`} />
+            <TrendingUp className={`w-4 h-4 ${onglet === "evos" ? "text-green-300" : ""}`} />
             <p className={`${onglet === "evos" ? "text-green-300" : ""}`}>Evolution</p>
           </span>
         </div>
@@ -614,7 +631,6 @@ function App() {
               <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
                 <TransfertsList
                   transferts={transferts}
-                  players={players}
                   onCreateTransfert={handleCreateTransfert}
                 />
               </div>
@@ -648,6 +664,7 @@ function App() {
                       <p className="text-gray-400 text-sm text-center">© 2025 - TeamMaker.</p>
                     </div>
                   </div>
+                  {/* <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md"></div> */}
                 </>
               ) : (
                 <div className="text-gray-400 text-sm text-center py-8">
