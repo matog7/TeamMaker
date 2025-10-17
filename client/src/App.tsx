@@ -661,7 +661,7 @@ function App() {
                         L'équipe doit avoir au moins 21 joueurs, dont 10 originaires du pays de l'équipe (formation).
                         10 achats maximum à l'achat en été, et 5 ventes maximum. 5 transferts entrants et sortants maximum en hiver.
                         Les ajouts d'agent libre sont limités à 1 par équipe, et par saison. Lors du mercato d'hiver, les signatures de joueurs en fin de contrat sont limitées à 2 par équipe.
-
+                        Enfin, il faut impérativement avoir au moins un joueur originel lors de la finale de champions league.
                       </p>
                       <p className="text-green-300 text-sm text-center mb-2">TeamMaker - v1.0.0</p>
                       <p className="text-gray-400 text-sm text-center">Tous droits réservés.</p>
