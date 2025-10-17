@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { X, Plus } from "lucide-react";
-import type { TransfertCreate, Tag } from "../interfaces/transfert";
+import type { TransfertCreate } from "../interfaces/transfert";
 
 interface NewTransfertModalProps {
     isOpen: boolean;
@@ -220,17 +220,21 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
                                 {formData.tags.map((tag, index) => (
                                     <div
                                         key={index}
-                                        className="flex items-center gap-1 px-2 py-1 rounded-full text-xs text-white"
-                                        style={{ backgroundColor: tag.color }}
+                                        className="relative inline-block group"
                                     >
-                                        <span>{tag.name}</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => removeTag(index)}
-                                            className="hover:bg-black/20 rounded-full p-0.5"
+                                        <div
+                                            className="inline-flex items-center px-2 py-1 rounded-full text-xs text-white"
+                                            style={{ backgroundColor: tag.color }}
                                         >
-                                            <X className="w-3 h-3" />
-                                        </button>
+                                            <span>{tag.name}</span>
+                                        </div>
+                                        <span
+                                            // type="button"
+                                            onClick={() => removeTag(index)}
+                                            className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+                                        >
+                                            <X className="w-2.5 h-2.5 text-white" />
+                                        </span>
                                     </div>
                                 ))}
                             </div>

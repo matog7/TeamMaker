@@ -11,3 +11,4 @@ export { default as CompetitionSelector } from "./CompetitionSelector";
 export { default as NewCompetitionModal } from "./NewCompetitionModal";
 export { default as TransfertsList } from "./TransfertsList";
 export { default as NewTransfertModal } from "./NewTransfertModal";
+export { default as ObjectivesSection } from "./ObjectivesSection";

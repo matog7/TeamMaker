@@ -29,6 +29,12 @@ export type {
   TeamStats,
 } from "./team";
 
+export type {
+  Objective,
+  ObjectiveCreate,
+  ObjectiveUpdate,
+} from "./objective";
+
 // Types utilitaires
 export interface ApiResponse<T> {
   success: boolean;

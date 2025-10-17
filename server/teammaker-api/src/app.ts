@@ -8,6 +8,7 @@ import TeamPlayersRoutes from "./routes/TeamPlayersRoutes";
 import PlayerStatsRoutes from "./routes/PlayerStatsRoutes";
 import PlayersRoutes from "./routes/PlayersRoutes";
 import TransfertRoutes from "./routes/TransfertRoutes";
+import ObjectivesRoutes from "./routes/ObjectivesRoutes";
 
 dotenv.config();
 
@@ -37,6 +38,7 @@ app.use("/api", TeamPlayersRoutes);
 app.use("/api", PlayerStatsRoutes);
 app.use("/api", PlayersRoutes);
 app.use("/api", TransfertRoutes);
+app.use("/api", ObjectivesRoutes);
 
 const port = Number(process.env.PORT || 3000);
 app.listen(port, () => {

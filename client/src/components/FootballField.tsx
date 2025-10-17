@@ -22,7 +22,7 @@ const FootballField: React.FC<FootballFieldProps> = ({
     >
       <div className="p-6 border-b border-gray-200/10 border-dashed">
         <h2 className="text-lg font-semibold text-center text-white">
-          Terrain de Football
+          Le 11 de départ
         </h2>
       </div>
       <div className="flex-1 p-6 flex items-center justify-center">

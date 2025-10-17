@@ -28,6 +28,7 @@ import {
   CompetitionSelector,
   NewCompetitionModal,
   TransfertsList,
+  ObjectivesSection,
 } from "./components";
 import SubstitutesSection from "./components/SubstitutesSection";
 import { FileChartColumn, TrendingUp, Users } from "lucide-react";
@@ -627,7 +628,7 @@ function App() {
                   onSaveTeam={handleSaveTeam}
                 />
               </div>
-              {/* Section Formations et Joueurs */}
+              {/* Section Transferts */}
               <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
                 <TransfertsList
                   transferts={transferts}
@@ -650,6 +651,9 @@ function App() {
                     onAddSubstitute={openModal}
                     onPlayerClick={openModal}
                   />
+                  <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
+                    <ObjectivesSection teamId={selectedTeam?.id} />
+                  </div>
                   <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
                     <div className="flex flex-col items-center justify-center">
                       <p className="text-gray-400 text-sm text-left mb-2">

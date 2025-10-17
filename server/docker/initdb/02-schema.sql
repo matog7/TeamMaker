@@ -127,6 +127,29 @@ CREATE TABLE IF NOT EXISTS transferts (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Table des objectifs
+CREATE TABLE IF NOT EXISTS objectives (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    description TEXT,
+    completed BOOLEAN DEFAULT FALSE,
+    priority VARCHAR(10) NOT NULL CHECK (
+        priority IN ('low', 'medium', 'high')
+    ),
+    category VARCHAR(20) NOT NULL CHECK (
+        category IN (
+            'team',
+            'player',
+            'transfer',
+            'competition',
+            'general'
+        )
+    ),
+    team_id INTEGER REFERENCES teams (id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Index pour améliorer les performances
 CREATE INDEX IF NOT EXISTS idx_players_position ON players (position);
 
@@ -144,6 +167,12 @@ CREATE INDEX IF NOT EXISTS idx_player_stats_competition_id ON player_stats (comp
 
 CREATE INDEX IF NOT EXISTS idx_transferts_team_id ON transferts (team_id);
 
+CREATE INDEX IF NOT EXISTS idx_objectives_team_id ON objectives (team_id);
+
+CREATE INDEX IF NOT EXISTS idx_objectives_category ON objectives (category);
+
+CREATE INDEX IF NOT EXISTS idx_objectives_priority ON objectives (priority);
+
 -- Trigger pour mettre à jour updated_at automatiquement
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -157,6 +186,9 @@ CREATE TRIGGER update_players_updated_at BEFORE UPDATE ON players
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_teams_updated_at BEFORE UPDATE ON teams
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_objectives_updated_at BEFORE UPDATE ON objectives
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Ajouter la contrainte unique pour player_stats si elle n'existe pas

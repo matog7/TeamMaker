@@ -12,6 +12,9 @@ import type {
   PlayerStats,
   CompetitionCreate,
   TransfertCreate,
+  Objective,
+  ObjectiveCreate,
+  ObjectiveUpdate,
 } from "../interfaces";
 import { API_CONFIG } from "../config/configApi";
 
@@ -212,6 +215,38 @@ export const transfertAPI = {
   create: async (transfert: TransfertCreate, team_id: number) => {
     const response = await api.post("/transferts", { ...transfert, team_id });
     return response.data;
+  },
+};
+
+// API des objectifs
+export const objectiveAPI = {
+  // Récupérer tous les objectifs d'une équipe
+  getByTeam: async (teamId: number): Promise<Objective[]> => {
+    const response = await api.get(`/objectives/${teamId}`);
+    return response.data;
+  },
+
+  // Récupérer tous les objectifs généraux
+  getGeneral: async (): Promise<Objective[]> => {
+    const response = await api.get("/objectives");
+    return response.data;
+  },
+
+  // Créer un nouvel objectif
+  create: async (objective: ObjectiveCreate): Promise<Objective> => {
+    const response = await api.post("/objectives", objective);
+    return response.data;
+  },
+
+  // Mettre à jour un objectif
+  update: async (id: number, objective: ObjectiveUpdate): Promise<Objective> => {
+    const response = await api.put(`/objectives/${id}`, objective);
+    return response.data;
+  },
+
+  // Supprimer un objectif
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/objectives/${id}`);
   },
 };
 
