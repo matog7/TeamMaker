@@ -88,6 +88,33 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
                 </div>
             ) : (
                 <div className="space-y-3">
+                    {transferts.length > 0 && (
+                        <div className="flex flex-row items-center gap-2">
+                            <span className="text-gray-400 text-sm">
+                                {transferts.length} transferts
+                            </span>
+                            <span className="text-gray-400 text-sm">|</span>
+                            <span className="text-gray-400 text-sm">
+                                {transferts.filter(transfert => transfert.status === 'vendu').length} vendus pour {transferts.filter(transfert => transfert.status === 'vendu').reduce((acc, transfert) => acc + parseFloat(transfert.price), 0)} M€
+                            </span>
+                            <span className="text-gray-400 text-sm">|</span>
+                            <span className="text-gray-400 text-sm">
+                                {transferts.filter(transfert => transfert.status === 'prete').length} prêtés
+                            </span>
+                            <span className="text-gray-400 text-sm">|</span>
+                            <span className="text-gray-400 text-sm">
+                                {transferts.filter(transfert => transfert.status === 'liste_suivi').length} en liste de suivi
+                            </span>
+                            <span className="text-gray-400 text-sm">|</span>
+                            <span className="text-gray-400 text-sm">
+                                {transferts.filter(transfert => transfert.status === 'liste_attente').length} en liste d'attente
+                            </span>
+                            <span className="text-gray-400 text-sm">|</span>
+                            <span className="text-gray-400 text-sm">
+                                {transferts.filter(transfert => transfert.status === 'achete').length} achetés pour {transferts.filter(transfert => transfert.status === 'achete').reduce((acc, transfert) => acc + parseFloat(transfert.price), 0)} M€
+                            </span>
+                        </div>
+                    )}
                     {transferts.map((transfert) => (
                         <div
                             key={transfert.id}
