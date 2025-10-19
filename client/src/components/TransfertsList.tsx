@@ -14,6 +14,7 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
     onCreateTransfert
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [status, setStatus] = useState('mercato');
 
     const getStatusIcon = (status: string) => {
         switch (status) {
@@ -73,6 +74,22 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
                     <ArrowLeftRight className="w-5 h-5 text-green-300" />
                     Transferts
                 </h2>
+                <div className="flex flex-row items-center gap-2">
+                    <span
+                        onClick={() => setStatus('mercato')}
+                        className={`min-w-20 text-center p-2 rounded-md text-sm font-medium bg-black/80 hover:bg-green-700 cursor-pointer transition-colors
+                            ${status === 'mercato' ? 'text-green-300 bg-green-300/10' : ''} 
+                            cursor-pointer`}>
+                        Mercato
+                    </span>
+                    <span
+                        onClick={() => setStatus('suivi')}
+                        className={`min-w-20 text-center p-2 rounded-md text-sm font-medium bg-black/80 hover:bg-green-700 cursor-pointer transition-colors
+                            ${status === 'suivi' ? 'text-green-300 bg-green-300/10' : ''} 
+                            cursor-pointer`}>
+                        Suivi
+                    </span>
+                </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm transition-colors"
@@ -107,15 +124,23 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
                             </span>
                             <span className="text-gray-400 text-sm">|</span>
                             <span className="text-gray-400 text-sm">
-                                {transferts.filter(transfert => transfert.status === 'liste_attente').length} en liste d'attente
+                                {transferts.filter(transfert => transfert.status === 'achete').length} achetés pour {transferts.filter(transfert => transfert.status === 'achete').reduce((acc, transfert) => acc + parseFloat(transfert.price === 'Gratuit' ? '0€' : transfert.price), 0)} M€
                             </span>
                             <span className="text-gray-400 text-sm">|</span>
-                            <span className="text-gray-400 text-sm">
-                                {transferts.filter(transfert => transfert.status === 'achete').length} achetés pour {transferts.filter(transfert => transfert.status === 'achete').reduce((acc, transfert) => acc + parseFloat(transfert.price), 0)} M€
+                            <span className={`text-gray-400 text-sm ${transferts.filter(transfert => transfert.status === 'achete').reduce((acc, transfert) => acc + parseFloat(transfert.price === 'Gratuit' ? '0€' : transfert.price), 0) - transferts.filter(transfert => transfert.status === 'vendu').reduce((acc, transfert) => acc + parseFloat(transfert.price), 0) > 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                Résultat net : {Math.abs(transferts.filter(transfert => transfert.status === 'achete').reduce((acc, transfert) =>
+                                    acc + parseFloat(transfert.price === 'Gratuit' ? '0€' : transfert.price), 0)
+                                    - transferts.filter(transfert => transfert.status === 'vendu').reduce((acc, transfert) => acc + parseFloat(transfert.price), 0))
+                                    .toFixed(2)} M€
                             </span>
                         </div>
                     )}
-                    {transferts.map((transfert) => (
+                    {transferts.filter(transfert => status === 'mercato' ?
+                        transfert.status === 'achete' ||
+                        transfert.status === 'vendu' ||
+                        transfert.status === 'prete' : transfert.status === 'liste_suivi' ||
+                        transfert.status === 'liste_attente'
+                    ).map((transfert) => (
                         <div
                             key={transfert.id}
                             className="bg-gray-50/10 border-gray-200/20 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative"

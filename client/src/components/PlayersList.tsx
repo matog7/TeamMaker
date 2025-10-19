@@ -74,9 +74,10 @@ const PlayersList: React.FC<PlayersListProps> = ({
                         className="w-4 h-4"
                       />
                     )}
-                    <span className="text-white text-xs">
+                    <span className="text-gray-400 text-xs">
                       {player.position}
                     </span>
+                    <span className="text-gray-400 text-xs">- {player.age} ans</span>
                   </div>
                 </div>
                 <div className="flex-shrink-0">

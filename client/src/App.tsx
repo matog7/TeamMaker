@@ -658,10 +658,13 @@ function App() {
                     <div className="flex flex-col items-center justify-center">
                       <p className="text-gray-400 text-sm text-left mb-2">
                         Les contraintes pour chaque sauvegarde doivent être respectées. Les voici :
-                        L'équipe doit avoir au moins 21 joueurs, dont 10 originaires du pays de l'équipe (formation).
-                        10 achats maximum à l'achat en été, et 5 ventes maximum. 5 transferts entrants et sortants maximum en hiver.
-                        Les ajouts d'agent libre sont limités à 1 par équipe, et par saison. Lors du mercato d'hiver, les signatures de joueurs en fin de contrat sont limitées à 2 par équipe.
-                        Enfin, il faut impérativement avoir au moins un joueur originel lors de la finale de champions league.
+                        L'équipe doit avoir au moins 21 joueurs, dont 10 originaires du pays de l'équipe (formation/natif).
+                        10 achats maximum à l'achat en été, et 8 ventes maximum. 5 transferts entrants et sortants maximum en hiver.
+                        Les ajouts d'agent libre sont limités à 1 par équipe, et par saison. Lors du mercato d'hiver, les signatures de joueurs en fin de contrat sont limitées à 2 par équipe,
+                        ces 2 critères respectant des notes cohérentes avec l'équipe. Les joueurs pouvant être recrutés doivent être dans une division similaire à l'équipe dans le top 7 européen, sinon uniquement des prêts sont possibles.
+                        En revanche, pour les championnats en dehors de ce top, les recrutements sont possibles.
+                        Concernant la saison finale, il faut impérativement avoir au moins un joueur originel lors de la finale de champions league.
+                        Enfin, si le comité de direction décide de mettre fin au contrat, c'est une fin de carrière.
                       </p>
                       <p className="text-green-300 text-sm text-center mb-2">TeamMaker - v1.0.0</p>
                       <p className="text-gray-400 text-sm text-center">Tous droits réservés.</p>

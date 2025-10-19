@@ -35,7 +35,7 @@ const SubstitutesSection: React.FC<SubstitutesSectionProps> = ({ subs, nbOfPlaye
         </div>
       ) : (
         <div className="w-full grid grid-cols-2 gap-3 overflow-y-auto flex-1 justify-center items-center">
-          {Object.values(subs).map((player) => (
+          {Object.values(subs).filter(player => player.position_order && player.position_order < 100).map((player) => (
             <div
               key={player.id}
               className="group bg-gray-50/10 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative border-gray-200/20"
@@ -58,7 +58,7 @@ const SubstitutesSection: React.FC<SubstitutesSectionProps> = ({ subs, nbOfPlaye
                   </div>
                 )}
                 <div className="absolute text-xs font-bold text-[#79eea5]/20 top-0 left-1 items-center justify-center">
-                  #{player.id}
+                  #{player.position_order}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="font-semibold text-white text-sm truncate">
@@ -74,9 +74,10 @@ const SubstitutesSection: React.FC<SubstitutesSectionProps> = ({ subs, nbOfPlaye
                         className="w-4 h-4"
                       />
                     )}
-                    <span className="text-white text-xs">
+                    <span className="text-gray-400 text-xs">
                       {player.position}
                     </span>
+                    <span className="text-gray-400 text-xs">- {player.age} ans</span>
                   </div>
                 </div>
                 <div className="flex-shrink-0">
