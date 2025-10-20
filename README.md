@@ -4,7 +4,7 @@
 
 - Résultat saison (points, bp, bc, victoire, nul, defaite) ✅
 - Afficher joueurs pretes, joueurs promus et joueurs arrivés en cours de saison -> ajouter à la modale de création de joueurs
-- Ajouter le club d'origine d'un joueur recruté
+- Ajouter le club d'origine d'un joueur recruté ✅
 - Faire fonctionner import photo avec nommage en base en tant que nom de famille du joueur en minuscule -> ex : exemple.png
 - Styliser stats pour différencier les catégories avec les meilleurs joueurs (buts, passes et matchs), icones de compétitions et modale de création
 - Ajouter la page réportoriant l'évolution des joueurs pour l'équipe suivante (copie de l'actuelle en fin de saison mais nouvelle saison et nouvelles competitions)

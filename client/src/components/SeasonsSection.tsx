@@ -118,6 +118,19 @@ const SeasonsSection: React.FC<SeasonsSectionProps> = ({ teamId }) => {
                     {s?.bp}BP - {s.bc}BC
                   </div>
                 </div>
+                {s.detail && s.detail.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {s.detail.slice(0, 10).map((d, i) => (
+                      <div
+                        key={i}
+                        className="inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs text-white bg-gray-500/30 border border-gray-400/30"
+                      >
+                        <span>{d.competition}</span>
+                        <span className="uppercase">{d.result}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <span className="px-2 py-1 text-xs rounded-full bg-green-500/20 border border-green-500/50 text-green-300">
                     V {s.wins}
@@ -130,19 +143,6 @@ const SeasonsSection: React.FC<SeasonsSectionProps> = ({ teamId }) => {
                   </span>
                 </div>
               </div>
-              {s.detail && s.detail.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {s.detail.slice(0, 10).map((d, i) => (
-                    <div
-                      key={i}
-                      className="inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs text-white bg-gray-500/30 border border-gray-400/30"
-                    >
-                      <span>{d.competition}</span>
-                      <span className="uppercase">{d.result}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           ))}
         </div>
