@@ -15,6 +15,9 @@ import type {
   Objective,
   ObjectiveCreate,
   ObjectiveUpdate,
+  Season,
+  SeasonCreate,
+  SeasonUpdate,
 } from "../interfaces";
 import { API_CONFIG } from "../config/configApi";
 
@@ -158,16 +161,19 @@ export const playerStatsAPI = {
     return response.data;
   },
 
-  getAllStats: async (players: Record<number, PlayerUpdate>, competitionId?: number) => {
+  getAllStats: async (
+    players: Record<number, PlayerUpdate>,
+    competitionId?: number
+  ) => {
     // Extraire les IDs des joueurs
     const playerIds = Object.values(players)
-      .map(player => player.player_id || player.id)
-      .filter(id => id && id !== 0);
+      .map((player) => player.player_id || player.id)
+      .filter((id) => id && id !== 0);
 
     console.log("IDs des joueurs à récupérer:", playerIds);
 
     const response = await api.get("/player-stats", {
-      params: { players: playerIds.join(','), competition_id: competitionId }
+      params: { players: playerIds.join(","), competition_id: competitionId },
     });
     return response.data;
   },
@@ -180,11 +186,12 @@ export const playerStatsAPI = {
 
   // Sauvegarder les statistiques de plusieurs joueurs
   saveMultipleStats: async (statsArray: PlayerStats[]) => {
-    const response = await api.post("/player-stats/bulk", { stats: statsArray });
+    const response = await api.post("/player-stats/bulk", {
+      stats: statsArray,
+    });
     return response.data;
   },
 };
-
 
 // API des compétitions
 export const competitionAPI = {
@@ -206,7 +213,6 @@ export const competitionAPI = {
 };
 
 export const transfertAPI = {
-
   getAll: async (team_id: number) => {
     const response = await api.get("/transferts", { params: { team_id } });
     return response.data;
@@ -239,7 +245,10 @@ export const objectiveAPI = {
   },
 
   // Mettre à jour un objectif
-  update: async (id: number, objective: ObjectiveUpdate): Promise<Objective> => {
+  update: async (
+    id: number,
+    objective: ObjectiveUpdate
+  ): Promise<Objective> => {
     const response = await api.put(`/objectives/${id}`, objective);
     return response.data;
   },
@@ -247,6 +256,33 @@ export const objectiveAPI = {
   // Supprimer un objectif
   delete: async (id: number): Promise<void> => {
     await api.delete(`/objectives/${id}`);
+  },
+};
+
+// API des saisons
+export const seasonAPI = {
+  getAll: async (): Promise<Season[]> => {
+    const response = await api.get("/seasons");
+    return response.data;
+  },
+
+  getByTeam: async (teamId: number): Promise<Season[]> => {
+    const response = await api.get(`/teams/${teamId}/seasons`);
+    return response.data;
+  },
+
+  create: async (payload: SeasonCreate): Promise<Season> => {
+    const response = await api.post("/seasons", payload);
+    return response.data;
+  },
+
+  update: async (id: number, payload: SeasonUpdate): Promise<Season> => {
+    const response = await api.put(`/seasons/${id}`, payload);
+    return response.data;
+  },
+
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/seasons/${id}`);
   },
 };
 

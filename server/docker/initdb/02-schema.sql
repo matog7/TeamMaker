@@ -150,6 +150,20 @@ CREATE TABLE IF NOT EXISTS objectives (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Table des saisons (liée à une équipe)
+CREATE TABLE IF NOT EXISTS seasons (
+    id SERIAL PRIMARY KEY,
+    team_id INTEGER REFERENCES teams (id) ON DELETE CASCADE,
+    wins INTEGER DEFAULT 0 CHECK (wins >= 0),
+    draws INTEGER DEFAULT 0 CHECK (draws >= 0),
+    losses INTEGER DEFAULT 0 CHECK (losses >= 0),
+    bp INTEGER DEFAULT 0 CHECK (bp >= 0),
+    bc INTEGER DEFAULT 0 CHECK (bc >= 0),
+    detail JSONB DEFAULT '[]'::jsonb, -- détail des résultats par compétition/match
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Index pour améliorer les performances
 CREATE INDEX IF NOT EXISTS idx_players_position ON players (position);
 
@@ -172,6 +186,8 @@ CREATE INDEX IF NOT EXISTS idx_objectives_team_id ON objectives (team_id);
 CREATE INDEX IF NOT EXISTS idx_objectives_category ON objectives (category);
 
 CREATE INDEX IF NOT EXISTS idx_objectives_priority ON objectives (priority);
+
+CREATE INDEX IF NOT EXISTS idx_seasons_team_id ON seasons (team_id);
 
 -- Trigger pour mettre à jour updated_at automatiquement
 CREATE OR REPLACE FUNCTION update_updated_at_column()

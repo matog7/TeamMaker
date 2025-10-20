@@ -12,3 +12,5 @@ export { default as NewCompetitionModal } from "./NewCompetitionModal";
 export { default as TransfertsList } from "./TransfertsList";
 export { default as NewTransfertModal } from "./NewTransfertModal";
 export { default as ObjectivesSection } from "./ObjectivesSection";
+export { default as SeasonsSection } from "./SeasonsSection";
+export { default as NewSeasonModal } from "./NewSeasonModal";

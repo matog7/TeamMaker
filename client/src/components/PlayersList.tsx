@@ -3,6 +3,7 @@ import type { Player, Team, FormationWithPositions } from "../interfaces";
 import { shortNationalities } from "../config/consts";
 import { getRatingColor } from "../utils/ratingColors";
 import Flag from "react-world-flags";
+import { GiTeamDowngrade } from "react-icons/gi";
 
 interface PlayersListProps {
   players: Record<number, Player>;
@@ -23,11 +24,14 @@ const PlayersList: React.FC<PlayersListProps> = ({
 }) => {
   return (
     <div className="flex-1 flex flex-col ">
-      <h2 className="text-lg text-left font-semibold text-white mb-4">
-        {selectedTeam
-          ? `Joueurs - ${selectedTeam.name}`
-          : "Joueurs sur le terrain"}
-      </h2>
+      <div className="flex flex-row items-center mb-4 gap-2">
+        <GiTeamDowngrade className="w-5 h-5 text-green-300" />
+        <h2 className="text-lg text-left font-semibold text-white">
+          {selectedTeam
+            ? `Joueurs - ${selectedTeam.name}`
+            : "Joueurs sur le terrain"}
+        </h2>
+      </div>
       <div className="w-full grid grid-cols-2 gap-3 overflow-y-auto flex-1 justify-center items-center">
         {selectedFormation?.positions.map((_, idx) => {
           const player = players[idx];
@@ -35,10 +39,11 @@ const PlayersList: React.FC<PlayersListProps> = ({
           return (
             <div
               key={idx}
-              className={`group bg-gray-50/10 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative ${players[idx]?.is_captain
-                ? "border-orange-300/20 bg-orange-500/10"
-                : "border-gray-200/20"
-                }`}
+              className={`group bg-gray-50/10 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative ${
+                players[idx]?.is_captain
+                  ? "border-orange-300/20 bg-orange-500/10"
+                  : "border-gray-200/20"
+              }`}
               onClick={() => onPlayerClick(idx)}
             >
               <div className="flex flex-row items-center gap-3">
@@ -77,18 +82,24 @@ const PlayersList: React.FC<PlayersListProps> = ({
                     <span className="text-gray-400 text-xs">
                       {player.position}
                     </span>
-                    <span className="text-gray-400 text-xs">- {player.age} ans</span>
+                    <span className="text-gray-400 text-xs">
+                      - {player.age} ans
+                    </span>
                   </div>
                 </div>
                 <div className="flex-shrink-0">
                   <div className="flex justify-center gap-1 text-xs">
                     <span
-                      className={`px-2 py-1 rounded-full text-white font-medium ${getRatingColor(player.rating)}`}
+                      className={`px-2 py-1 rounded-full text-white font-medium ${getRatingColor(
+                        player.rating
+                      )}`}
                     >
                       {player.rating || 0}
                     </span>
                     <span
-                      className={`px-2 py-1 rounded-full text-white font-medium ${getRatingColor(player.potential)}`}
+                      className={`px-2 py-1 rounded-full text-white font-medium ${getRatingColor(
+                        player.potential
+                      )}`}
                     >
                       {player.potential || 0}
                     </span>

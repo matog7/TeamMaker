@@ -12,7 +12,13 @@ import type {
   Transfert,
   TransfertCreate,
 } from "./interfaces";
-import { competitionAPI, formationAPI, playerAPI, teamAPI, transfertAPI } from "./services/api";
+import {
+  competitionAPI,
+  formationAPI,
+  playerAPI,
+  teamAPI,
+  transfertAPI,
+} from "./services/api";
 import { ERROR_MESSAGES } from "./config/configApi";
 import toast, { Toaster } from "react-hot-toast";
 import {
@@ -29,6 +35,7 @@ import {
   NewCompetitionModal,
   TransfertsList,
   ObjectivesSection,
+  SeasonsSection,
 } from "./components";
 import SubstitutesSection from "./components/SubstitutesSection";
 import { FileChartColumn, TrendingUp, Users } from "lucide-react";
@@ -61,7 +68,8 @@ function App() {
 
   // États pour les compétitions
   const [competitions, setCompetitions] = useState<Competition[]>([]);
-  const [selectedCompetition, setSelectedCompetition] = useState<Competition | null>(null);
+  const [selectedCompetition, setSelectedCompetition] =
+    useState<Competition | null>(null);
 
   // États pour les transferts
   const [transferts, setTransferts] = useState<Transfert[]>([]);
@@ -118,8 +126,7 @@ function App() {
         console.log("Joueurs de l'équipe chargés:", teamWithPlayers);
         // trie des joueurs de l'équipe dans l'ordre de leur position
         const sortedPlayers = teamWithPlayers.sort(
-          (a: TeamPlayer, b: TeamPlayer) =>
-            a.position_order - b.position_order
+          (a: TeamPlayer, b: TeamPlayer) => a.position_order - b.position_order
         );
         if (sortedPlayers.length > 10) {
           const eleven = sortedPlayers.slice(0, 11);
@@ -154,10 +161,7 @@ function App() {
               };
             }
           }
-          console.log(
-            "custom playerList de l'équipe sélectionnée",
-            playerList
-          );
+          console.log("custom playerList de l'équipe sélectionnée", playerList);
           setPlayers(playerList);
         }
 
@@ -198,7 +202,9 @@ function App() {
 
   // Récupération des transferts
   const fetchTransferts = async () => {
-    const transfertsList = await transfertAPI.getAll(selectedTeam?.id as number);
+    const transfertsList = await transfertAPI.getAll(
+      selectedTeam?.id as number
+    );
     console.log("Transferts chargés:", transfertsList);
     setTransferts(transfertsList);
   };
@@ -277,7 +283,7 @@ function App() {
     console.log("Nouveau joueur créé:", {
       editingIndex,
       position: playerData.position,
-      isSubstitute: editingIndex > 10
+      isSubstitute: editingIndex > 10,
     });
 
     // Si c'est un remplaçant (index > 10), l'ajouter aux remplaçants
@@ -409,7 +415,9 @@ function App() {
   };
 
   // Gère la création d'une nouvelle compétition
-  const handleCreateCompetition = async (competitionData: CompetitionCreate) => {
+  const handleCreateCompetition = async (
+    competitionData: CompetitionCreate
+  ) => {
     const newCompetition: Competition = {
       id: Date.now(), // ID temporaire
       ...competitionData,
@@ -419,7 +427,7 @@ function App() {
 
     await competitionAPI.create(newCompetition);
 
-    setCompetitions(prev => [...prev, newCompetition]);
+    setCompetitions((prev) => [...prev, newCompetition]);
     setSelectedCompetition(newCompetition);
 
     toast.success("Compétition créée avec succès !", {
@@ -465,7 +473,10 @@ function App() {
           console.log("players (titulaires):", players);
           console.log("subs (remplaçants):", subs);
           console.log("allPlayers (fusionnés):", allPlayers);
-          console.log("nombre total de joueurs:", Object.keys(allPlayers).length);
+          console.log(
+            "nombre total de joueurs:",
+            Object.keys(allPlayers).length
+          );
           await teamAPI.createWithPlayers(selectedTeam.id, allPlayers);
         }
 
@@ -523,8 +534,11 @@ function App() {
 
   // Gère la création d'un nouveau transfert
   const handleCreateTransfert = async (transfertData: TransfertCreate) => {
-    const newTransfert = await transfertAPI.create(transfertData, selectedTeam?.id as number);
-    setTransferts(prev => [...prev, newTransfert]);
+    const newTransfert = await transfertAPI.create(
+      transfertData,
+      selectedTeam?.id as number
+    );
+    setTransferts((prev) => [...prev, newTransfert]);
     toast.success("Transfert créé avec succès !", {
       duration: 3000,
       position: "top-right",
@@ -574,17 +588,48 @@ function App() {
       <Header />
       {selectedTeam && (
         <div className="flex justify-center items-center gap-4">
-          <span onClick={() => setOnglet("equipe")} className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${onglet === "equipe" ? "bg-green-300/10 text-green-300" : ""}`}>
-            <Users className={`w-4 h-4 ${onglet === "equipe" ? "text-green-300" : ""}`} />
-            <p className={`${onglet === "equipe" ? "text-green-300" : ""}`}>Equipe</p>
+          <span
+            onClick={() => setOnglet("equipe")}
+            className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${
+              onglet === "equipe" ? "bg-green-300/10 text-green-300" : ""
+            }`}
+          >
+            <Users
+              className={`w-4 h-4 ${
+                onglet === "equipe" ? "text-green-300" : ""
+              }`}
+            />
+            <p className={`${onglet === "equipe" ? "text-green-300" : ""}`}>
+              Equipe
+            </p>
           </span>
-          <span onClick={() => setOnglet("stats")} className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${onglet === "stats" ? "bg-green-300/10 text-green-300" : ""}`}>
-            <FileChartColumn className={`w-4 h-4 ${onglet === "stats" ? "text-green-300" : ""}`} />
-            <p className={`${onglet === "stats" ? "text-green-300" : ""}`}>Stats</p>
+          <span
+            onClick={() => setOnglet("stats")}
+            className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${
+              onglet === "stats" ? "bg-green-300/10 text-green-300" : ""
+            }`}
+          >
+            <FileChartColumn
+              className={`w-4 h-4 ${
+                onglet === "stats" ? "text-green-300" : ""
+              }`}
+            />
+            <p className={`${onglet === "stats" ? "text-green-300" : ""}`}>
+              Stats
+            </p>
           </span>
-          <span onClick={() => setOnglet("evos")} className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${onglet === "evos" ? "bg-green-300/10 text-green-300" : ""}`}>
-            <TrendingUp className={`w-4 h-4 ${onglet === "evos" ? "text-green-300" : ""}`} />
-            <p className={`${onglet === "evos" ? "text-green-300" : ""}`}>Evolution</p>
+          <span
+            onClick={() => setOnglet("evos")}
+            className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${
+              onglet === "evos" ? "bg-green-300/10 text-green-300" : ""
+            }`}
+          >
+            <TrendingUp
+              className={`w-4 h-4 ${onglet === "evos" ? "text-green-300" : ""}`}
+            />
+            <p className={`${onglet === "evos" ? "text-green-300" : ""}`}>
+              Evolution
+            </p>
           </span>
         </div>
       )}
@@ -640,6 +685,11 @@ function App() {
             <div className="w-1/2 p-6 flex flex-col p-6 gap-6">
               {selectedTeam ? (
                 <>
+                  <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
+                    {selectedTeam && (
+                      <SeasonsSection teamId={selectedTeam.id} />
+                    )}
+                  </div>
                   <FootballField
                     selectedFormation={selectedFormation}
                     players={players}
@@ -657,18 +707,35 @@ function App() {
                   <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
                     <div className="flex flex-col items-center justify-center">
                       <p className="text-gray-400 text-sm text-left mb-2">
-                        Les contraintes pour chaque sauvegarde doivent être respectées. Les voici :
-                        L'équipe doit avoir au moins 21 joueurs, dont 10 originaires du pays de l'équipe (formation/natif).
-                        10 achats maximum à l'achat en été, et 8 ventes maximum. 5 transferts entrants et sortants maximum en hiver.
-                        Les ajouts d'agent libre sont limités à 1 par équipe, et par saison. Lors du mercato d'hiver, les signatures de joueurs en fin de contrat sont limitées à 2 par équipe,
-                        ces 2 critères respectant des notes cohérentes avec l'équipe. Les joueurs pouvant être recrutés doivent être dans une division similaire à l'équipe dans le top 7 européen, sinon uniquement des prêts sont possibles.
-                        En revanche, pour les championnats en dehors de ce top, les recrutements sont possibles.
-                        Concernant la saison finale, il faut impérativement avoir au moins un joueur originel lors de la finale de champions league.
-                        Enfin, si le comité de direction décide de mettre fin au contrat, c'est une fin de carrière.
+                        Les contraintes pour chaque sauvegarde doivent être
+                        respectées. Les voici : L'équipe doit avoir au moins 21
+                        joueurs, dont 10 originaires du pays de l'équipe
+                        (formation/natif). 10 achats maximum à l'achat en été,
+                        et 8 ventes maximum. 5 transferts entrants et sortants
+                        maximum en hiver. Les ajouts d'agent libre sont limités
+                        à 1 par équipe, et par saison. Lors du mercato d'hiver,
+                        les signatures de joueurs en fin de contrat sont
+                        limitées à 2 par équipe, ces 2 critères respectant des
+                        notes cohérentes avec l'équipe. Les joueurs pouvant être
+                        recrutés doivent être dans une division similaire à
+                        l'équipe dans le top 7 européen, sinon uniquement des
+                        prêts sont possibles. En revanche, pour les championnats
+                        en dehors de ce top, les recrutements sont possibles.
+                        Concernant la saison finale, il faut impérativement
+                        avoir au moins un joueur originel lors de la finale de
+                        champions league. Enfin, si le comité de direction
+                        décide de mettre fin au contrat, c'est une fin de
+                        carrière.
                       </p>
-                      <p className="text-green-300 text-sm text-center mb-2">TeamMaker - v1.0.0</p>
-                      <p className="text-gray-400 text-sm text-center">Tous droits réservés.</p>
-                      <p className="text-gray-400 text-sm text-center">© 2025 - TeamMaker.</p>
+                      <p className="text-green-300 text-sm text-center mb-2">
+                        TeamMaker - v1.0.0
+                      </p>
+                      <p className="text-gray-400 text-sm text-center">
+                        Tous droits réservés.
+                      </p>
+                      <p className="text-gray-400 text-sm text-center">
+                        © 2025 - TeamMaker.
+                      </p>
                     </div>
                   </div>
                   {/* <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md"></div> */}
@@ -680,7 +747,8 @@ function App() {
               )}
             </div>
           </div>
-        </div>)}
+        </div>
+      )}
       {onglet === "stats" && (
         <div className="flex-1 flex overflow-hidden">
           <div className="w-full flex">
@@ -719,7 +787,9 @@ function App() {
         editingIndex={editingIndex}
         player={
           editingIndex !== null
-            ? (editingIndex > 10 ? subs[editingIndex] : players[editingIndex])
+            ? editingIndex > 10
+              ? subs[editingIndex]
+              : players[editingIndex]
             : null
         }
         playerPosition={

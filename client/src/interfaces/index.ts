@@ -31,11 +31,7 @@ export type {
   TeamStats,
 } from "./team";
 
-export type {
-  Objective,
-  ObjectiveCreate,
-  ObjectiveUpdate,
-} from "./objective";
+export type { Objective, ObjectiveCreate, ObjectiveUpdate } from "./objective";
 
 export type {
   Competition,
@@ -44,10 +40,13 @@ export type {
 } from "./competition";
 
 export type {
-  Transfert,
-  TransfertCreate,
-  TransfertUpdate,
-} from "./transfert";
+  Season,
+  SeasonCreate,
+  SeasonUpdate,
+  SeasonDetailItem,
+} from "./season";
+
+export type { Transfert, TransfertCreate, TransfertUpdate } from "./transfert";
 
 // Types utilitaires
 export interface ApiResponse<T> {
