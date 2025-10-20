@@ -22,6 +22,9 @@ CREATE TABLE IF NOT EXISTS players (
         AND age <= 45
     ),
     nationality VARCHAR(50),
+    is_loaned BOOLEAN NOT NULL DEFAULT(FALSE),
+    is_promoted BOOLEAN NOT NULL DEFAULT(FALSE),
+    arrived_in_course BOOLEAN NOT NULL DEFAULT(FALSE),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -225,3 +228,16 @@ BEGIN
         RAISE NOTICE 'Contrainte unique existe déjà sur player_stats';
     END IF;
 END $$;
+
+-- Table des blessures
+CREATE TABLE IF NOT EXISTS injuries (
+    id SERIAL PRIMARY KEY,
+    player_id INTEGER NOT NULL,
+    injury VARCHAR(255) NOT NULL,
+    duration VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Index pour améliorer les performances
+CREATE INDEX IF NOT EXISTS idx_injuries_player_id ON injuries (player_id);

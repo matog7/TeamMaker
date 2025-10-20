@@ -39,9 +39,23 @@ const PlayersList: React.FC<PlayersListProps> = ({
           return (
             <div
               key={idx}
-              className={`group bg-gray-50/10 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative ${
+              className={`group  ${
+                players[idx]?.is_loaned
+                  ? "bg-blue-500/10"
+                  : players[idx]?.arrived_in_course
+                  ? "bg-green-500/10"
+                  : players[idx]?.is_promoted
+                  ? "bg-yellow-500/10"
+                  : "bg-gray-50/10"
+              } rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative ${
                 players[idx]?.is_captain
                   ? "border-orange-300/20 bg-orange-500/10"
+                  : players[idx]?.is_loaned
+                  ? "border-blue-500/50"
+                  : players[idx]?.arrived_in_course
+                  ? "border-green-500/50"
+                  : players[idx]?.is_promoted
+                  ? "border-yellow-500/50"
                   : "border-gray-200/20"
               }`}
               onClick={() => onPlayerClick(idx)}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import type {
   Player,
   Formation,
@@ -36,6 +36,7 @@ import {
   TransfertsList,
   ObjectivesSection,
   SeasonsSection,
+  InjuriesSection,
 } from "./components";
 import SubstitutesSection from "./components/SubstitutesSection";
 import { FileChartColumn, TrendingUp, Users } from "lucide-react";
@@ -119,7 +120,7 @@ function App() {
   };
 
   // Récupération des joueurs d'une équipe sélectionnée
-  const fetchTeamPlayers = async () => {
+  const fetchTeamPlayers = useCallback(async () => {
     if (selectedTeam && formations.length > 0) {
       try {
         const teamWithPlayers = await teamAPI.getWithPlayers(selectedTeam.id);
@@ -155,6 +156,9 @@ function App() {
                 id: 0,
                 name: "",
                 is_captain: false,
+                is_loaned: false,
+                arrived_in_course: false,
+                is_promoted: false,
                 // position: "GK",
                 created_at: "",
                 updated_at: "",
@@ -181,10 +185,10 @@ function App() {
         );
       }
     }
-  };
+  }, [selectedTeam, formations]);
 
   // Récupération de la formation de l'équipe sélectionnée
-  const fetchFormation = async () => {
+  const fetchFormation = useCallback(async () => {
     if (selectedTeam?.formation_id) {
       console.log(
         "Formation de l'équipe sélectionnée chargée:",
@@ -198,16 +202,16 @@ function App() {
         setSelectedFormation(formation);
       }
     }
-  };
+  }, [selectedTeam, formations]);
 
   // Récupération des transferts
-  const fetchTransferts = async () => {
+  const fetchTransferts = useCallback(async () => {
     const transfertsList = await transfertAPI.getAll(
       selectedTeam?.id as number
     );
     console.log("Transferts chargés:", transfertsList);
     setTransferts(transfertsList);
-  };
+  }, [selectedTeam]);
 
   // Récupérations au chargement de l'application
   useEffect(() => {
@@ -221,7 +225,13 @@ function App() {
     fetchTeamPlayers();
     fetchFormation();
     fetchTransferts();
-  }, [selectedTeam, formations]);
+  }, [
+    selectedTeam,
+    formations,
+    fetchTeamPlayers,
+    fetchFormation,
+    fetchTransferts,
+  ]);
 
   // Ouvre la modale pour une position donnée
   const openModal = (index: number) => {
@@ -314,6 +324,9 @@ function App() {
       age: string;
       nationality: string;
       position: string;
+      is_loaned: boolean;
+      is_promoted: boolean;
+      arrived_in_course: boolean;
     }
   ) => {
     if (!editingIndex) return;
@@ -323,9 +336,10 @@ function App() {
         playerData
       );
       console.log("updatedPlayer", updatedPlayer);
-    } catch (err) {
-      console.error("Erreur lors de la mise à jour du joueur:", err);
-    } finally {
+
+      // Recharger l'équipe pour afficher les modifications
+      await fetchTeamPlayers();
+
       toast.success("Joueur mis à jour avec succès !", {
         duration: 3000,
         position: "top-right",
@@ -334,6 +348,17 @@ function App() {
           color: "#fff",
         },
       });
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour du joueur:", err);
+      toast.error("Erreur lors de la mise à jour du joueur", {
+        duration: 3000,
+        position: "top-right",
+        style: {
+          background: "#EF4444",
+          color: "#fff",
+        },
+      });
+    } finally {
       setModalOpen(false);
       setEditingIndex(null);
     }
@@ -662,6 +687,16 @@ function App() {
                 />
               </div>
 
+              {selectedTeam && (
+                <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
+                  <InjuriesSection
+                    teamId={selectedTeam.id}
+                    players={Object.values(players)
+                      .concat(Object.values(subs))
+                      .filter((p) => p && p.id !== 0)}
+                  />
+                </div>
+              )}
               {/* Section Formations et Joueurs */}
               <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
                 <PlayersList
@@ -678,6 +713,16 @@ function App() {
                 <TransfertsList
                   transferts={transferts}
                   onCreateTransfert={handleCreateTransfert}
+                  onTransfertUpdated={(updated) => {
+                    setTransferts((prev) =>
+                      prev.map((t) => (t.id === updated.id ? updated : t))
+                    );
+                  }}
+                  onTransfertDeleted={(transfertId) => {
+                    setTransferts((prev) =>
+                      prev.filter((t) => t.id !== transfertId)
+                    );
+                  }}
                 />
               </div>
             </div>

@@ -1,17 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Plus } from "lucide-react";
-import type { TransfertCreate } from "../interfaces/transfert";
+import type { Transfert, TransfertCreate } from "../interfaces/transfert";
 
 interface NewTransfertModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreateTransfert: (transfert: TransfertCreate) => void;
+  onCreateTransfert?: (transfert: TransfertCreate) => void;
+  onUpdateTransfert?: (id: number, transfert: Partial<TransfertCreate>) => void;
+  transfertToEdit?: Transfert | null;
 }
 
 const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
   isOpen,
   onClose,
   onCreateTransfert,
+  onUpdateTransfert,
+  transfertToEdit,
 }) => {
   const [formData, setFormData] = useState<TransfertCreate>({
     player_name: "",
@@ -26,6 +30,34 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
 
   const [newTag, setNewTag] = useState({ name: "", color: "#3B82F6" });
   const [showTagInput, setShowTagInput] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (transfertToEdit) {
+        setFormData({
+          player_name: transfertToEdit.player_name || "",
+          overall: transfertToEdit.overall || 0,
+          potential: transfertToEdit.potential || 0,
+          status: transfertToEdit.status,
+          price: transfertToEdit.price || "",
+          send_to: transfertToEdit.send_to || "",
+          from: transfertToEdit.from || "",
+          tags: transfertToEdit.tags || [],
+        });
+      } else {
+        setFormData({
+          player_name: "",
+          overall: 0,
+          potential: 0,
+          status: "liste_suivi",
+          price: "",
+          send_to: "",
+          from: "",
+          tags: [],
+        });
+      }
+    }
+  }, [isOpen, transfertToEdit]);
 
   const predefinedColors = [
     "#3B82F6", // Bleu
@@ -43,7 +75,18 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.player_name && formData.price) {
-      onCreateTransfert(formData);
+      // Préparer les données en s'assurant que send_to et from sont vides si non applicables
+      const submitData = {
+        ...formData,
+        send_to: formData.status === "vendu" ? formData.send_to : "",
+        from: formData.status === "achete" ? formData.from : "",
+      };
+
+      if (transfertToEdit && onUpdateTransfert) {
+        onUpdateTransfert(transfertToEdit.id, submitData);
+      } else if (onCreateTransfert) {
+        onCreateTransfert(submitData);
+      }
       setFormData({
         player_name: "",
         overall: 0,
@@ -64,10 +107,53 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "player_id" ? parseInt(value) : value,
-    }));
+
+    // Gestion spéciale pour le changement de statut
+    if (name === "status") {
+      setFormData((prev) => {
+        const newStatus = value as
+          | "vendu"
+          | "prete"
+          | "liste_suivi"
+          | "liste_attente"
+          | "achete";
+        const prevStatus = prev.status;
+
+        // Logique de nettoyage des champs selon le changement de statut
+        let newSendTo = prev.send_to;
+        let newFrom = prev.from;
+
+        if (prevStatus === "vendu" && newStatus === "achete") {
+          // Vente → Achat : vider send_to et compléter from avec la valeur de send_to
+          newFrom = prev.send_to || "";
+          newSendTo = "";
+        } else if (prevStatus === "achete" && newStatus === "vendu") {
+          // Achat → Vente : vider from et compléter send_to avec la valeur de from
+          newSendTo = prev.from || "";
+          newFrom = "";
+        } else if (newStatus !== "vendu" && newStatus !== "achete") {
+          // Autres cas : vider les deux champs
+          newSendTo = "";
+          newFrom = "";
+        }
+
+        return {
+          ...prev,
+          status: newStatus,
+          send_to: newSendTo,
+          from: newFrom,
+        };
+      });
+    } else {
+      // Gestion normale pour les autres champs
+      setFormData((prev) => ({
+        ...prev,
+        [name]:
+          name === "overall" || name === "potential"
+            ? parseInt(value || "0")
+            : value,
+      }));
+    }
   };
 
   const addTag = () => {
@@ -109,7 +195,7 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-white flex items-center gap-2">
             <Plus className="w-5 h-5 text-green-300" />
-            Nouveau Transfert
+            {transfertToEdit ? "Modifier Transfert" : "Nouveau Transfert"}
           </h2>
           <button
             onClick={onClose}
@@ -211,6 +297,7 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
               />
             </div>
           )}
+
           {formData.status === "achete" && (
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -221,7 +308,7 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
                 name="from"
                 value={formData.from}
                 onChange={handleChange}
-                placeholder="Ex: Real Madrid, Barcelona..."
+                placeholder="Ex: Lyon, OM..."
                 className="w-full px-2 py-1 border-b border-gray-300/50 text-[#79eea5] focus:outline-none focus:border-[#03af62]"
                 required
               />
@@ -246,7 +333,6 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
                       <span>{tag.name}</span>
                     </div>
                     <span
-                      // type="button"
                       onClick={() => removeTag(index)}
                       className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
                     >
@@ -342,7 +428,7 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
               type="submit"
               className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
             >
-              Créer
+              {transfertToEdit ? "Mettre à jour" : "Créer"}
             </button>
           </div>
         </form>

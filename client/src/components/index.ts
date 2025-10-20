@@ -14,3 +14,5 @@ export { default as NewTransfertModal } from "./NewTransfertModal";
 export { default as ObjectivesSection } from "./ObjectivesSection";
 export { default as SeasonsSection } from "./SeasonsSection";
 export { default as NewSeasonModal } from "./NewSeasonModal";
+export { default as InjuriesSection } from "./InjuriesSection";
+export { default as NewInjuryModal } from "./NewInjuryModal";

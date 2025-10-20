@@ -4,7 +4,10 @@ export interface Player {
   rating?: number;
   potential?: number;
   is_captain: boolean;
+  is_loaned: boolean;
+  arrived_in_course: boolean;
   position_order?: number;
+  is_promoted: boolean;
   photo?: string;
   position?: "GK" | "DEF" | "MID" | "ATT";
   age?: number;

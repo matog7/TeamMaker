@@ -11,18 +11,27 @@ import {
 import type { Transfert, TransfertCreate } from "../interfaces";
 import NewTransfertModal from "./NewTransfertModal";
 import { getRatingColor } from "../utils/ratingColors";
+import { transfertAPI } from "../services/api";
+import toast from "react-hot-toast";
 
 interface TransfertsListProps {
   transferts: Transfert[];
   onCreateTransfert: (transfert: TransfertCreate) => void;
+  onTransfertUpdated?: (transfert: Transfert) => void;
+  onTransfertDeleted?: (transfertId: number) => void;
 }
 
 const TransfertsList: React.FC<TransfertsListProps> = ({
   transferts,
   onCreateTransfert,
+  onTransfertUpdated,
+  onTransfertDeleted,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [status, setStatus] = useState("mercato");
+  const [editingTransfert, setEditingTransfert] = useState<Transfert | null>(
+    null
+  );
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -75,6 +84,49 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
     }
   };
 
+  const onUpdateTransfert = async (
+    id: number,
+    payload: Partial<TransfertCreate>
+  ) => {
+    try {
+      const updated: Transfert = await transfertAPI.update(id, payload);
+      if (onTransfertUpdated) onTransfertUpdated(updated);
+      toast.success("Transfert mis à jour avec succès !");
+      setIsModalOpen(false);
+      setEditingTransfert(null);
+    } catch (err) {
+      console.error(err);
+      toast.error("Erreur lors de la mise à jour du transfert");
+    }
+  };
+
+  const handleDeleteTransfert = async (transfertId: number) => {
+    try {
+      await transfertAPI.delete(transfertId);
+      if (onTransfertDeleted) {
+        onTransfertDeleted(transfertId);
+      }
+      toast.success("Transfert supprimé avec succès !", {
+        duration: 3000,
+        position: "top-right",
+        style: {
+          background: "#10B981",
+          color: "#fff",
+        },
+      });
+    } catch (error) {
+      console.error("Erreur lors de la suppression du transfert:", error);
+      toast.error("Erreur lors de la suppression du transfert", {
+        duration: 3000,
+        position: "top-right",
+        style: {
+          background: "#EF4444",
+          color: "#fff",
+        },
+      });
+    }
+  };
+
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -109,7 +161,10 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
           </span>
         </div>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setEditingTransfert(null);
+            setIsModalOpen(true);
+          }}
           className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-md text-sm transition-colors"
         >
           <Plus className="w-4 h-4" />
@@ -127,6 +182,34 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
             <div className="flex flex-row items-center gap-2">
               <span className="text-gray-400 text-sm">
                 {transferts.length} transferts
+              </span>
+              <span className="text-gray-400 text-sm">|</span>
+              <span className="text-gray-400 text-sm">
+                {
+                  transferts.filter(
+                    (transfert) => transfert.status === "achete"
+                  ).length
+                }{" "}
+                achetés pour{" "}
+                {transferts
+                  .filter((transfert) => transfert.status === "achete")
+                  .reduce(
+                    (acc, transfert) =>
+                      acc +
+                      parseFloat(
+                        transfert.price === "Gratuit" ? "0€" : transfert.price
+                      ),
+                    0
+                  )}{" "}
+                M€
+              </span>
+              <span className="text-gray-400 text-sm">|</span>
+              <span className="text-gray-400 text-sm">
+                {
+                  transferts.filter((transfert) => transfert.status === "prete")
+                    .length
+                }{" "}
+                prêtés
               </span>
               <span className="text-gray-400 text-sm">|</span>
               <span className="text-gray-400 text-sm">
@@ -159,26 +242,6 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
                   ).length
                 }{" "}
                 en liste de suivi
-              </span>
-              <span className="text-gray-400 text-sm">|</span>
-              <span className="text-gray-400 text-sm">
-                {
-                  transferts.filter(
-                    (transfert) => transfert.status === "achete"
-                  ).length
-                }{" "}
-                achetés pour{" "}
-                {transferts
-                  .filter((transfert) => transfert.status === "achete")
-                  .reduce(
-                    (acc, transfert) =>
-                      acc +
-                      parseFloat(
-                        transfert.price === "Gratuit" ? "0€" : transfert.price
-                      ),
-                    0
-                  )}{" "}
-                M€
               </span>
               <span className="text-gray-400 text-sm">|</span>
               <span
@@ -239,8 +302,23 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
             .map((transfert) => (
               <div
                 key={transfert.id}
-                className="bg-gray-50/10 border-gray-200/20 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative"
+                className="bg-gray-50/10 border-gray-200/20 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative group"
+                onClick={() => {
+                  setEditingTransfert(transfert);
+                  setIsModalOpen(true);
+                }}
               >
+                {/* Bouton de suppression */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteTransfert(transfert.id);
+                  }}
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shadow-lg"
+                  title="Supprimer le transfert"
+                >
+                  ×
+                </button>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-row items-center gap-3">
                     {getStatusIcon(transfert.status)}
@@ -270,7 +348,7 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
                             : transfert.from
                             ? `Ancien club: ${transfert.from}`
                             : ""}{" "}
-                          pour {transfert.price}
+                          {transfert.price}
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -321,6 +399,8 @@ const TransfertsList: React.FC<TransfertsListProps> = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onCreateTransfert={onCreateTransfert}
+        onUpdateTransfert={onUpdateTransfert}
+        transfertToEdit={editingTransfert}
       />
     </div>
   );

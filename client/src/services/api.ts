@@ -13,6 +13,9 @@ import type {
   CompetitionCreate,
   TransfertCreate,
   Objective,
+  Injury,
+  InjuryCreate,
+  InjuryUpdate,
   ObjectiveCreate,
   ObjectiveUpdate,
   Season,
@@ -222,6 +225,15 @@ export const transfertAPI = {
     const response = await api.post("/transferts", { ...transfert, team_id });
     return response.data;
   },
+
+  update: async (id: number, payload: Partial<TransfertCreate>) => {
+    const response = await api.put(`/transferts/${id}`, payload);
+    return response.data;
+  },
+
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/transferts/${id}`);
+  },
 };
 
 // API des objectifs
@@ -283,6 +295,35 @@ export const seasonAPI = {
 
   delete: async (id: number): Promise<void> => {
     await api.delete(`/seasons/${id}`);
+  },
+};
+
+// API des blessures
+export const injuryAPI = {
+  getAll: async (teamId: number): Promise<Injury[]> => {
+    const response = await api.get("/injuries", {
+      params: { team_id: teamId },
+    });
+    return response.data;
+  },
+
+  getById: async (id: number): Promise<Injury> => {
+    const response = await api.get(`/injuries/${id}`);
+    return response.data;
+  },
+
+  create: async (injury: InjuryCreate): Promise<Injury> => {
+    const response = await api.post("/injuries", injury);
+    return response.data;
+  },
+
+  update: async (id: number, payload: InjuryUpdate): Promise<Injury> => {
+    const response = await api.put(`/injuries/${id}`, payload);
+    return response.data;
+  },
+
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/injuries/${id}`);
   },
 };
 

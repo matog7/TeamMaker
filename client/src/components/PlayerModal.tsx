@@ -17,6 +17,9 @@ interface PlayerModalProps {
     age: string;
     nationality: string;
     position: string;
+    is_loaned: boolean;
+    is_promoted: boolean;
+    arrived_in_course: boolean;
   }) => void;
   handlePlayerUpdate: (
     player: PlayerUpdate,
@@ -28,6 +31,9 @@ interface PlayerModalProps {
       age: string;
       nationality: string;
       position: string;
+      is_loaned: boolean;
+      is_promoted: boolean;
+      arrived_in_course: boolean;
     }
   ) => void;
 }
@@ -49,6 +55,9 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
     age: "",
     nationality: "",
     position: "",
+    is_loaned: false,
+    is_promoted: false,
+    arrived_in_course: false,
   });
 
   // États pour le select avec recherche
@@ -90,6 +99,9 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
         age: player.age?.toString() || "",
         nationality: player.nationality || "",
         position: playerPosition?.position_type || player?.position || "",
+        is_loaned: player.is_loaned || false,
+        is_promoted: player.is_promoted || false,
+        arrived_in_course: player.arrived_in_course || false,
       });
       setNationalitySearch(player.nationality || "");
     } else if (isOpen) {
@@ -101,6 +113,9 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
         age: "",
         nationality: "",
         position: "",
+        is_loaned: false,
+        is_promoted: false,
+        arrived_in_course: false,
       });
       setNationalitySearch("");
     }
@@ -226,16 +241,24 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
               <select
                 className="w-full border-b rounded border-gray-300/50 px-2 py-1 text-green-300 focus:border-[#03af62] focus:outline-none focus:bg-green-300/10"
                 value={form.position}
-                onChange={(e) => setForm((f) => ({ ...f, position: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, position: e.target.value }))
+                }
                 required
               >
-
-                <option value="GK" className="text-[#79eea5] bg-green-300/10">GK</option>
-                <option value="DEF" className="text-[#79eea5]">DEF</option>
-                <option value="MID" className="text-[#79eea5]">MID</option>
-                <option value="ATT" className="text-[#79eea5]">ATT</option>
+                <option value="GK" className="text-[#79eea5] bg-green-300/10">
+                  GK
+                </option>
+                <option value="DEF" className="text-[#79eea5]">
+                  DEF
+                </option>
+                <option value="MID" className="text-[#79eea5]">
+                  MID
+                </option>
+                <option value="ATT" className="text-[#79eea5]">
+                  ATT
+                </option>
               </select>
-
             </div>
           )}
           <div className="relative w-full" ref={nationalityDropdownRef}>
@@ -329,6 +352,72 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
                   }
                 }}
               />
+            </div>
+          </div>
+
+          {/* Nouveaux champs booléens */}
+          <div className="w-full space-y-3">
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="is_loaned"
+                className="w-4 h-4 text-[#03af62] bg-gray-100 border-gray-300 rounded focus:ring-[#03af62] focus:ring-2"
+                checked={form.is_loaned}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    is_loaned: e.target.checked,
+                  }))
+                }
+              />
+              <label
+                htmlFor="is_loaned"
+                className="text-sm font-medium text-white"
+              >
+                Prêté
+              </label>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="is_promoted"
+                className="w-4 h-4 text-[#03af62] bg-gray-100 border-gray-300 rounded focus:ring-[#03af62] focus:ring-2"
+                checked={form.is_promoted}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    is_promoted: e.target.checked,
+                  }))
+                }
+              />
+              <label
+                htmlFor="is_promoted"
+                className="text-sm font-medium text-white"
+              >
+                Promu
+              </label>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                id="arrived_in_course"
+                className="w-4 h-4 text-[#03af62] bg-gray-100 border-gray-300 rounded focus:ring-[#03af62] focus:ring-2"
+                checked={form.arrived_in_course}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    arrived_in_course: e.target.checked,
+                  }))
+                }
+              />
+              <label
+                htmlFor="arrived_in_course"
+                className="text-sm font-medium text-white"
+              >
+                Arrivé en cours de saison
+              </label>
             </div>
           </div>
 
