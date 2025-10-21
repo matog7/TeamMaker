@@ -46,6 +46,27 @@ button {
   transition: border-color 0.25s;
 }
 
+button#add-tag-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 16px;
+  font-weight: 500;
+  width: 50px;
+  height: 30px;
+  font-family: inherit;
+  background-color: #1a1a1a73;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button#add-tag-button:hover {
+  border-color: #03af62;
+  color: #79eea5;
+}
+
 button.isHighlighted {
   border-color: #03af62;
   color: #79eea5;

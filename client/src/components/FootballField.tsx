@@ -22,7 +22,7 @@ const FootballField: React.FC<FootballFieldProps> = ({
     >
       <div className="p-6 border-b border-gray-200/10 border-dashed">
         <h2 className="text-lg font-semibold text-center text-white">
-          Le 11 de départ
+          Le XI de départ
         </h2>
       </div>
       <div className="flex-1 p-6 flex items-center justify-center">
@@ -74,12 +74,13 @@ const FootballField: React.FC<FootballFieldProps> = ({
                     )}
                   </div>
                   <div
-                    className={`absolute -top-2  transform -translate-x-1/2 text-xs font-bold ${players[index].rating && players[index].rating > 70
-                      ? "bg-green-600"
-                      : players[index].rating && players[index].rating > 60
+                    className={`absolute -top-2  transform -translate-x-1/2 text-xs font-bold ${
+                      players[index].rating && players[index].rating > 70
+                        ? "bg-green-600"
+                        : players[index].rating && players[index].rating > 60
                         ? "bg-yellow-500"
                         : "bg-red-500"
-                      } text-white rounded-full px-2 py-1 border-2 border-gray-200/50 shadow-md `}
+                    } text-white rounded-full px-2 py-1 border-2 border-gray-200/50 shadow-md `}
                   >
                     {players[index].rating}
                   </div>

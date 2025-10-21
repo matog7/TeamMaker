@@ -317,12 +317,25 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
 
           {/* Section Tags */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Tags
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Tags
+              </label>
+              {/* Bouton pour ajouter un tag */}
+              {!showTagInput && (
+                <button
+                  type="button"
+                  id="add-tag-button"
+                  onClick={() => setShowTagInput(true)}
+                  title="Ajouter un tag"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              )}
+            </div>
 
             {/* Affichage des tags existants */}
-            {formData.tags && formData.tags.length > 0 && (
+            {formData.tags && formData.tags.length > 0 ? (
               <div className="flex flex-wrap gap-2 mb-3">
                 {formData.tags.map((tag, index) => (
                   <div key={index} className="relative inline-block group">
@@ -341,18 +354,12 @@ const NewTransfertModal: React.FC<NewTransfertModalProps> = ({
                   </div>
                 ))}
               </div>
-            )}
-
-            {/* Bouton pour ajouter un tag */}
-            {!showTagInput && (
-              <button
-                type="button"
-                onClick={() => setShowTagInput(true)}
-                className="flex items-center gap-2 px-3 py-2 border border-dashed border-gray-400/50 rounded-md text-gray-300 hover:text-white hover:border-gray-300 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Ajouter un tag
-              </button>
+            ) : (
+              !showTagInput && (
+                <div className="flex items-center justify-center">
+                  <p className="text-gray-400 text-sm">Aucun tag</p>
+                </div>
+              )
             )}
 
             {/* Formulaire d'ajout de tag */}
