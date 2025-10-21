@@ -5,7 +5,7 @@ import type {
   SeasonCreate,
   SeasonDetailItem,
   SeasonUpdate,
-} from "../interfaces";
+} from "../../interfaces";
 
 interface NewSeasonModalProps {
   isOpen: boolean;
@@ -225,10 +225,22 @@ const NewSeasonModal: React.FC<NewSeasonModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Détails (optionnels)
-            </label>
-            {formData.detail && formData.detail.length > 0 && (
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Détails (optionnels)
+              </label>
+              {!showDetailInput && (
+                <button
+                  type="button"
+                  onClick={() => setShowDetailInput(true)}
+                  id="add-tag-button"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {formData.detail && formData.detail.length > 0 ? (
               <div className="flex flex-wrap gap-2 mb-3">
                 {formData.detail.map((d, i) => (
                   <div key={i} className="relative inline-block group">
@@ -245,17 +257,12 @@ const NewSeasonModal: React.FC<NewSeasonModalProps> = ({
                   </div>
                 ))}
               </div>
-            )}
-
-            {!showDetailInput && (
-              <button
-                type="button"
-                onClick={() => setShowDetailInput(true)}
-                className="flex items-center gap-2 px-3 py-2 border border-dashed border-gray-400/50 rounded-md text-gray-300 hover:text-white hover:border-gray-300 transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Ajouter un détail
-              </button>
+            ) : (
+              !showDetailInput && (
+                <div className="flex items-center justify-center">
+                  <p className="text-gray-400 text-sm">Aucun détail</p>
+                </div>
+              )
             )}
 
             {showDetailInput && (

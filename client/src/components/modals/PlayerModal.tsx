@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MonitorUp } from "lucide-react";
-import type { FormationPosition, Player, PlayerUpdate } from "../interfaces";
-import { nationalities } from "../config/consts";
+import type { FormationPosition, Player, PlayerUpdate } from "../../interfaces";
+import { nationalities } from "../../config/consts";
 
 interface PlayerModalProps {
   isOpen: boolean;

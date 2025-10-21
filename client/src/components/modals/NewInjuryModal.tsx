@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import type { Injury, InjuryCreate, PlayerUpdate } from "../interfaces";
+import type { Injury, InjuryCreate, PlayerUpdate } from "../../interfaces";
 
 interface NewInjuryModalProps {
   isOpen: boolean;

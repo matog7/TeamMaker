@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { CompetitionCreate } from "../interfaces";
+import type { CompetitionCreate } from "../../interfaces";
 
 interface NewCompetitionModalProps {
   isOpen: boolean;

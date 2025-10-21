@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Plus, AlertTriangle } from "lucide-react";
 import type { Injury, InjuryCreate, PlayerUpdate } from "../interfaces";
 import { injuryAPI } from "../services/api";
-import NewInjuryModal from "./NewInjuryModal";
+import NewInjuryModal from "./modals/NewInjuryModal";
 import toast from "react-hot-toast";
 
 interface InjuriesSectionProps {

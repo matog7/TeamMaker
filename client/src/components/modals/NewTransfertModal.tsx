@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, Plus } from "lucide-react";
-import type { Transfert, TransfertCreate } from "../interfaces/transfert";
+import type { Transfert, TransfertCreate } from "../../interfaces/transfert";
 
 interface NewTransfertModalProps {
   isOpen: boolean;

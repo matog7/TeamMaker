@@ -1,35 +1,38 @@
 import React, { useState } from "react";
-import type { FormationWithPositions } from "../interfaces";
+import type { Team, FormationWithPositions } from "../../interfaces";
 
-interface NewTeamModalProps {
+interface UpdateTeamModalProps {
   isOpen: boolean;
+  team: Team | null;
   formations: FormationWithPositions[];
-  selectedFormation: FormationWithPositions | null;
   onClose: () => void;
-  onSubmit: (teamData: { name: string; formation_id: string | null }) => void;
+  onSubmit: (teamData: {
+    name: string;
+    formation_id: string | undefined;
+  }) => void;
 }
 
-const NewTeamModal: React.FC<NewTeamModalProps> = ({
+const UpdateTeamModal: React.FC<UpdateTeamModalProps> = ({
   isOpen,
+  team,
   formations,
-  selectedFormation,
   onClose,
   onSubmit,
 }) => {
   const [form, setForm] = useState({
     name: "",
-    formation_id: selectedFormation?.id?.toString() || null,
+    formation_id: undefined as string | undefined,
   });
 
   // Initialiser le formulaire quand la modale s'ouvre
   React.useEffect(() => {
-    if (isOpen) {
+    if (isOpen && team) {
       setForm({
-        name: "",
-        formation_id: selectedFormation?.id?.toString() || null,
+        name: team.name,
+        formation_id: team.formation_id || undefined,
       });
     }
-  }, [isOpen, selectedFormation]);
+  }, [isOpen, team]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +51,7 @@ const NewTeamModal: React.FC<NewTeamModalProps> = ({
           &times;
         </button>
         <h3 className="text-lg font-bold mb-4 text-gray-900">
-          Créer une nouvelle équipe
+          Mettre à jour l'équipe
         </h3>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
@@ -60,7 +63,6 @@ const NewTeamModal: React.FC<NewTeamModalProps> = ({
               className="w-full border rounded px-2 py-1 text-gray-900"
               value={form.name}
               onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              placeholder="Ex: Équipe A, Real Madrid..."
               required
             />
           </div>
@@ -74,7 +76,7 @@ const NewTeamModal: React.FC<NewTeamModalProps> = ({
               onChange={(e) =>
                 setForm((f) => ({
                   ...f,
-                  formation_id: e.target.value || null,
+                  formation_id: e.target.value || undefined,
                 }))
               }
               required
@@ -91,7 +93,7 @@ const NewTeamModal: React.FC<NewTeamModalProps> = ({
             type="submit"
             className="w-full bg-green-600 text-white rounded py-2 font-semibold hover:bg-green-700 transition"
           >
-            Créer l'équipe
+            Mettre à jour l'équipe
           </button>
         </form>
       </div>
@@ -99,4 +101,4 @@ const NewTeamModal: React.FC<NewTeamModalProps> = ({
   );
 };
 
-export default NewTeamModal;
+export default UpdateTeamModal;
