@@ -13,4 +13,5 @@
 - Ajouter au clic d'un joueur de la liste des transferts la possibilité de le mettre à jour ✅
 - Ajouter la liste des blessures ✅
 - Revoir le style & clean code
+- Faire fonctionner la màj des remplaçants
 - Régler bug affichage des remplaçants ✅

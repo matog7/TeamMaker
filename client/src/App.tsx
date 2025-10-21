@@ -168,6 +168,7 @@ function App() {
           }
           console.log("custom playerList de l'équipe sélectionnée", playerList);
           setPlayers(playerList);
+          setSubs([]);
         }
 
         // Mettre à jour la formation sélectionnée si l'équipe en a une
@@ -199,7 +200,7 @@ function App() {
         (f) => f.id === selectedTeam.formation_id
       );
       if (formation) {
-        console.log("La formation de l'équipesélectionnée est:", formation);
+        console.log("La formation de l'équipe sélectionnée est:", formation);
         setSelectedFormation(formation);
       }
     }
