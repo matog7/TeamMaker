@@ -130,6 +130,13 @@ const NewSeasonModal: React.FC<NewSeasonModalProps> = ({
     setShowDetailInput(false);
   };
 
+  const removeDetail = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      detail: prev.detail?.filter((_, i) => i !== index) || [],
+    }));
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -224,12 +231,17 @@ const NewSeasonModal: React.FC<NewSeasonModalProps> = ({
             {formData.detail && formData.detail.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
                 {formData.detail.map((d, i) => (
-                  <div
-                    key={i}
-                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs text-white bg-gray-500/30 border border-gray-400/30"
-                  >
-                    <span>{d.competition} </span>
-                    <span className="uppercase">{d.result}</span>
+                  <div key={i} className="relative inline-block group">
+                    <div className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs text-white bg-gray-500/30 border border-gray-400/30">
+                      <span>{d.competition} </span>
+                      <span className="uppercase">{d.result}</span>
+                    </div>
+                    <span
+                      onClick={() => removeDetail(i)}
+                      className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+                    >
+                      <X className="w-2.5 h-2.5 text-white" />
+                    </span>
                   </div>
                 ))}
               </div>
