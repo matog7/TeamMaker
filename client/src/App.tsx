@@ -15,6 +15,7 @@ import type {
 import {
   competitionAPI,
   formationAPI,
+  imageAPI,
   playerAPI,
   teamAPI,
   transfertAPI,
@@ -55,7 +56,7 @@ function App() {
 
   // États pour les joueurs
   const [players, setPlayers] = useState<Record<number, Player>>({});
-  const [subs, setSubs] = useState<Record<number, Player>>({});
+  const [subs, setSubs] = useState<Player[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
 
   // États pour les editions
@@ -233,6 +234,10 @@ function App() {
     fetchTransferts,
   ]);
 
+  useEffect(() => {
+    console.log("Nouvelle Liste de remplaçants", subs);
+  }, [subs]);
+
   // Ouvre la modale pour une position donnée
   const openModal = (index: number) => {
     console.log("index", index);
@@ -267,7 +272,7 @@ function App() {
   // ----------------
 
   // Gère la soumission du formulaire de joueur
-  const handlePlayerSubmit = (playerData: {
+  const handlePlayerSubmit = async (playerData: {
     name: string;
     rating: string;
     potential: string;
@@ -279,12 +284,38 @@ function App() {
     if (editingIndex === null) return;
     console.log("playerData", playerData, editingIndex);
 
+    // Upload de l'image
+    let playerPhoto = undefined;
+    if (playerData.photo !== "") {
+      playerPhoto = await imageAPI.upload(playerData.photo, playerData.name);
+      if (!playerPhoto) {
+        toast.error("Erreur lors de l'upload de l'image", {
+          duration: 3000,
+          position: "top-right",
+          style: {
+            background: "#EF4444",
+            color: "#fff",
+          },
+        });
+        return;
+      } else {
+        toast.success("Image uploadée avec succès " + playerPhoto, {
+          duration: 3000,
+          position: "top-right",
+          style: {
+            background: "#10B981",
+            color: "#fff",
+          },
+        });
+      }
+    }
     const newPlayer = {
       id: editingIndex,
       name: playerData.name,
       rating: Number(playerData.rating),
       potential: Number(playerData.potential),
-      photo: playerData.photo,
+      photo:
+        playerPhoto || playerData.name.split(" ")[1].toLowerCase() + ".png",
       age: Number(playerData.age),
       nationality: playerData.nationality,
       position: playerData.position,
@@ -298,11 +329,9 @@ function App() {
 
     // Si c'est un remplaçant (index > 10), l'ajouter aux remplaçants
     if (editingIndex > 10) {
-      // Pour les remplaçants, utiliser l'index original comme clé
-      setSubs({
-        ...subs,
-        [editingIndex]: newPlayer,
-      });
+      newPlayer.position_order = editingIndex + subs.length;
+      // Pour les remplaçants, on ajoute à la suite comme le position order est défini
+      setSubs((prev: Player[]) => [...prev, newPlayer]);
     } else {
       // Sinon, l'ajouter aux joueurs titulaires
       setPlayers({
@@ -333,7 +362,8 @@ function App() {
     try {
       const updatedPlayer = await playerAPI.update(
         player?.player_id as number,
-        playerData
+        playerData,
+        selectedTeam?.id as number
       );
       console.log("updatedPlayer", updatedPlayer);
 
@@ -825,6 +855,15 @@ function App() {
           </div>
         </div>
       )}
+      {onglet === "evos" && (
+        <div className="flex-1 flex overflow-hidden">
+          <div className="w-full flex justify-center items-center">
+            <span className="text-gray-400 text-sm text-center py-8">
+              Evolution - En cours de développement
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Modales */}
       <PlayerModal
@@ -845,6 +884,9 @@ function App() {
         onClose={closeModal}
         onSubmit={handlePlayerSubmit}
         handlePlayerUpdate={handlePlayerUpdate}
+        players={Object.values(players)
+          .concat(Object.values(subs))
+          .filter((p) => p && p.id !== 0)}
       />
 
       <NewTeamModal

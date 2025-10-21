@@ -95,8 +95,8 @@ export const playerAPI = {
   },
 
   // Mettre à jour un joueur
-  update: async (id: number, player: PlayerUpdateSend) => {
-    const response = await api.put(`/players/${id}`, player);
+  update: async (id: number, player: PlayerUpdateSend, team_id: number) => {
+    const response = await api.put(`/players/${id}`, { ...player, team_id });
     return response.data;
   },
 };
@@ -324,6 +324,41 @@ export const injuryAPI = {
 
   delete: async (id: number): Promise<void> => {
     await api.delete(`/injuries/${id}`);
+  },
+};
+
+// API des images
+export const imageAPI = {
+  upload: async (imageData: string, player_name: string): Promise<string> => {
+    try {
+      // Convertir la data URL en blob
+      const response = await fetch(imageData);
+      const blob = await response.blob();
+
+      // Créer le nom de fichier
+      const fileExtension = blob.type.split("/")[1] || "png";
+      const fileName = `${player_name
+        .split(" ")[1]
+        .toLowerCase()}.${fileExtension}`;
+
+      // Créer un FormData pour l'upload
+      const formData = new FormData();
+      formData.append("image", blob, fileName);
+      formData.append("player_name", player_name);
+
+      // Envoyer l'image au serveur pour qu'il la sauvegarde dans public/uploads
+      const uploadResponse = await api.post("/upload-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      return uploadResponse.data.fileName || fileName;
+    } catch (error) {
+      console.error("Erreur lors de l'upload de l'image:", error);
+      // En cas d'erreur, retourner un nom de fichier par défaut
+      return `${player_name.split(" ")[1]}.png`;
+    }
   },
 };
 

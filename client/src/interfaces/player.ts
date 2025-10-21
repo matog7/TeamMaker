@@ -33,7 +33,7 @@ export interface PlayerUpdate {
   is_captain?: boolean;
   name?: string;
   nationality?: string;
-  photo: string;
+  photo?: string;
   player_id?: number;
   position?: "GK" | "DEF" | "MID" | "ATT";
   position_order?: number;

@@ -36,6 +36,7 @@ interface PlayerModalProps {
       arrived_in_course: boolean;
     }
   ) => void;
+  players: PlayerUpdate[];
 }
 
 const PlayerModal: React.FC<PlayerModalProps> = ({
@@ -46,6 +47,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
   onSubmit,
   editingIndex,
   handlePlayerUpdate,
+  players,
 }) => {
   const [form, setForm] = useState({
     name: "",
@@ -55,6 +57,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
     age: "",
     nationality: "",
     position: "",
+    position_order: 0,
     is_loaned: false,
     is_promoted: false,
     arrived_in_course: false,
@@ -99,6 +102,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
         age: player.age?.toString() || "",
         nationality: player.nationality || "",
         position: playerPosition?.position_type || player?.position || "",
+        position_order: player.position_order || 0,
         is_loaned: player.is_loaned || false,
         is_promoted: player.is_promoted || false,
         arrived_in_course: player.arrived_in_course || false,
@@ -113,6 +117,7 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
         age: "",
         nationality: "",
         position: "",
+        position_order: 0,
         is_loaned: false,
         is_promoted: false,
         arrived_in_course: false,
@@ -261,6 +266,40 @@ const PlayerModal: React.FC<PlayerModalProps> = ({
               </select>
             </div>
           )}
+          {editingIndex &&
+            player?.position_order &&
+            player?.position_order !== 0 && (
+              <div className="relative w-full">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Changer de position avec
+                </label>
+                <select
+                  name="player_id"
+                  value={form.position_order}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      position_order: parseInt(e.target.value),
+                    }))
+                  }
+                  className="w-full px-3 py-2 border-b border-gray-300/50 text-[#79eea5] focus:outline-none focus:border-[#03af62] bg-transparent"
+                  required
+                >
+                  <option value={0} className="text-gray-500">
+                    Sélectionner un joueur
+                  </option>
+                  {players.map((player) => (
+                    <option
+                      key={player.player_id}
+                      value={player.position_order}
+                      className="text-[#79eea5] bg-green-300/10"
+                    >
+                      {player.name} - #{player.position_order}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           <div className="relative w-full" ref={nationalityDropdownRef}>
             <label className="block text-sm font-medium text-white">
               Nationalité
