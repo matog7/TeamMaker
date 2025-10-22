@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import type { PlayerUpdate, PlayerStats, Competition } from "../interfaces";
+import type { PlayerUpdate, PlayerStats, Competition } from "../../interfaces";
 import { Save, Edit3, Trophy } from "lucide-react";
 import toast from "react-hot-toast";
-import { playerStatsAPI } from "../services/api";
+import { playerStatsAPI } from "../../services/api";
 
 interface PlayerStatsTableProps {
   players: Record<number, PlayerUpdate>;

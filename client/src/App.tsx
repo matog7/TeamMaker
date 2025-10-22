@@ -39,7 +39,7 @@ import {
   SeasonsSection,
   InjuriesSection,
 } from "./components";
-import SubstitutesSection from "./components/SubstitutesSection";
+import SubstitutesSection from "./components/equipe/SubstitutesSection";
 import { FileChartColumn, TrendingUp, Users } from "lucide-react";
 
 function App() {

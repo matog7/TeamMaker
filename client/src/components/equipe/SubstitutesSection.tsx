@@ -1,8 +1,8 @@
 import React from "react";
-import type { Player } from "../interfaces";
+import type { Player } from "../../interfaces";
 import { Plus } from "lucide-react";
 import Flag from "react-world-flags";
-import { shortNationalities } from "../config/consts";
+import { shortNationalities } from "../../config/consts";
 
 interface SubstitutesSectionProps {
   subs: Record<number, Player>;

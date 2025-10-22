@@ -1,7 +1,7 @@
 import React from "react";
 import moment from "moment";
 import { CaptionsOff } from "lucide-react";
-import type { Team } from "../interfaces";
+import type { Team } from "../../interfaces";
 
 interface TeamsSectionProps {
   teams: Team[];

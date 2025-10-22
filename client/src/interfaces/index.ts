@@ -31,7 +31,12 @@ export type {
   TeamStats,
 } from "./team";
 
-export type { Objective, ObjectiveCreate, ObjectiveUpdate } from "./objective";
+export type {
+  Objective,
+  ObjectiveCreate,
+  ObjectiveUpdate,
+  ObjectiveCategory,
+} from "./objective";
 
 export type {
   Competition,

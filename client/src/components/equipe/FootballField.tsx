@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import type { Player, FormationWithPositions } from "../interfaces";
+import type { Player, FormationWithPositions } from "../../interfaces";
 
 interface FootballFieldProps {
   selectedFormation: FormationWithPositions | null;

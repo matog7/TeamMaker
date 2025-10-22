@@ -1,7 +1,7 @@
 import React from "react";
-import type { Player, Team, FormationWithPositions } from "../interfaces";
-import { shortNationalities } from "../config/consts";
-import { getRatingColor } from "../utils/ratingColors";
+import type { Player, Team, FormationWithPositions } from "../../interfaces";
+import { shortNationalities } from "../../config/consts";
+import { getRatingColor } from "../../utils/ratingColors";
 import Flag from "react-world-flags";
 import { GiTeamDowngrade } from "react-icons/gi";
 

@@ -8,10 +8,10 @@ import {
   XCircle,
   ArrowLeftRight,
 } from "lucide-react";
-import type { Transfert, TransfertCreate } from "../interfaces";
-import NewTransfertModal from "./modals/NewTransfertModal";
-import { getRatingColor } from "../utils/ratingColors";
-import { transfertAPI } from "../services/api";
+import type { Transfert, TransfertCreate } from "../../interfaces";
+import NewTransfertModal from "../modals/NewTransfertModal";
+import { getRatingColor } from "../../utils/ratingColors";
+import { transfertAPI } from "../../services/api";
 import toast from "react-hot-toast";
 
 interface TransfertsListProps {

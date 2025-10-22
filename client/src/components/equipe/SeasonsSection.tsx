@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Plus, Trophy } from "lucide-react";
-import type { Season, SeasonCreate, SeasonUpdate } from "../interfaces";
-import { seasonAPI } from "../services/api";
-import NewSeasonModal from "./modals/NewSeasonModal";
+import type { Season, SeasonCreate, SeasonUpdate } from "../../interfaces";
+import { seasonAPI } from "../../services/api";
+import NewSeasonModal from "../modals/NewSeasonModal";
 import toast from "react-hot-toast";
 
 interface SeasonsSectionProps {
