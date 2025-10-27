@@ -8,9 +8,10 @@ const router = Router();
 router.get("/team-players/:teamId", async (req, res) => {
   const { teamId } = req.params;
   const result = await query(
-    "SELECT * FROM players JOIN team_players ON players.id = team_players.player_id WHERE team_players.team_id = $1",
+    "SELECT * FROM players JOIN team_players ON players.id = team_players.player_id WHERE team_players.team_id = $1 ORDER BY team_players.position_order",
     [teamId]
   );
+  console.log("result", result.rows.length, result.rows);
   res.json(result.rows);
 });
 
@@ -133,6 +134,21 @@ router.post("/team-players/:teamId", async (req, res) => {
   console.log("=== FIN API team-players ===");
   console.log("team_players inserted");
   res.json({ message: "team_players inserted" });
+});
+
+router.delete("/team-players/:teamId/:playerId", async (req, res) => {
+  const { teamId, playerId } = req.params;
+  await query(
+    "DELETE FROM team_players WHERE team_id = $1 AND player_id = $2",
+    [teamId, playerId]
+  );
+  await query(
+    "DELETE FROM player_stats WHERE team_id = $1 AND player_id = $2",
+    [teamId, playerId]
+  );
+  await query("DELETE FROM injuries WHERE player_id = $1", [playerId]);
+  await query("DELETE FROM players WHERE id = $1", [playerId]);
+  res.json({ message: "Le joueur a bien été supprimé" });
 });
 
 export default router;
