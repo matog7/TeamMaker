@@ -167,6 +167,19 @@ CREATE TABLE IF NOT EXISTS seasons (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Table des évolutions (liée à une équipe et aux joueurs)
+CREATE TABLE IF NOT EXISTS evolutions (
+    id SERIAL PRIMARY KEY,
+    team_id INTEGER REFERENCES teams (id) ON DELETE CASCADE,
+    player_id INTEGER REFERENCES players (id) ON DELETE CASCADE,
+    start_rating INTEGER NOT NULL,
+    end_rating INTEGER NOT NULL,
+    potential INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (team_id, player_id)
+);
+
 -- Index pour améliorer les performances
 CREATE INDEX IF NOT EXISTS idx_players_position ON players (position);
 
@@ -191,6 +204,10 @@ CREATE INDEX IF NOT EXISTS idx_objectives_category ON objectives (category);
 CREATE INDEX IF NOT EXISTS idx_objectives_priority ON objectives (priority);
 
 CREATE INDEX IF NOT EXISTS idx_seasons_team_id ON seasons (team_id);
+
+CREATE INDEX IF NOT EXISTS idx_evolutions_team_id ON evolutions (team_id);
+
+CREATE INDEX IF NOT EXISTS idx_evolutions_player_id ON evolutions (player_id);
 
 -- Trigger pour mettre à jour updated_at automatiquement
 CREATE OR REPLACE FUNCTION update_updated_at_column()

@@ -55,6 +55,8 @@ export type { Transfert, TransfertCreate, TransfertUpdate } from "./transfert";
 
 export type { Injury, InjuryCreate, InjuryUpdate } from "./injury";
 
+export type { Evolution, EvolutionCreate, EvolutionUpdate } from "./evolution";
+
 // Types utilitaires
 export interface ApiResponse<T> {
   success: boolean;

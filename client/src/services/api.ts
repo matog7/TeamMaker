@@ -21,6 +21,9 @@ import type {
   Season,
   SeasonCreate,
   SeasonUpdate,
+  Evolution,
+  EvolutionCreate,
+  EvolutionUpdate,
 } from "../interfaces";
 import { API_CONFIG } from "../config/configApi";
 
@@ -324,6 +327,35 @@ export const injuryAPI = {
 
   delete: async (id: number): Promise<void> => {
     await api.delete(`/injuries/${id}`);
+  },
+};
+
+// API des évolutions
+export const evolutionAPI = {
+  getAll: async (teamId: number): Promise<Evolution[]> => {
+    const response = await api.get("/evolutions", {
+      params: { team_id: teamId },
+    });
+    return response.data;
+  },
+
+  getById: async (id: number): Promise<Evolution> => {
+    const response = await api.get(`/evolutions/${id}`);
+    return response.data;
+  },
+
+  create: async (evolution: EvolutionCreate): Promise<Evolution> => {
+    const response = await api.post("/evolutions", evolution);
+    return response.data;
+  },
+
+  update: async (id: number, payload: EvolutionUpdate): Promise<Evolution> => {
+    const response = await api.put(`/evolutions/${id}`, payload);
+    return response.data;
+  },
+
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/evolutions/${id}`);
   },
 };
 

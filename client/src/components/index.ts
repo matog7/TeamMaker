@@ -16,3 +16,4 @@ export { default as SeasonsSection } from "./equipe/SeasonsSection";
 export { default as NewSeasonModal } from "./modals/NewSeasonModal";
 export { default as InjuriesSection } from "./equipe/InjuriesSection";
 export { default as NewInjuryModal } from "./modals/NewInjuryModal";
+export { default as EvolutionsList } from "./evos/EvolutionsList";

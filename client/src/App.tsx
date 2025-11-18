@@ -38,6 +38,7 @@ import {
   ObjectivesSection,
   SeasonsSection,
   InjuriesSection,
+  EvolutionsList,
 } from "./components";
 import SubstitutesSection from "./components/equipe/SubstitutesSection";
 import { FileChartColumn, TrendingUp, Users } from "lucide-react";
@@ -857,11 +858,9 @@ function App() {
         </div>
       )}
       {onglet === "evos" && (
-        <div className="flex-1 flex overflow-hidden">
-          <div className="w-full flex justify-center items-center">
-            <span className="text-gray-400 text-sm text-center py-8">
-              Evolution - En cours de développement
-            </span>
+        <div className="flex-1 flex overflow-hidden justify-center items-center">
+          <div className="w-full m-10 p-6 bg-green-300/10 rounded-lg border border-gray-500/50 border-dashed bg-blur-md">
+            <EvolutionsList players={players} selectedTeam={selectedTeam} />
           </div>
         </div>
       )}

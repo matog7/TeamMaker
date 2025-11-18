@@ -35,6 +35,12 @@ export type {
   ObjectiveUpdate,
 } from "./objective";
 
+export type {
+  Evolution,
+  EvolutionCreate,
+  EvolutionUpdate,
+} from "./evolution";
+
 // Types utilitaires
 export interface ApiResponse<T> {
   success: boolean;
