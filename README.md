@@ -15,5 +15,6 @@
 - Revoir le style & clean code
 - Faire fonctionner la màj des remplaçants
 - Trier les transferts par mercato
+- Ajouter la possibilité de dupliquer une équipe
 - Bien séparer la récupération des titulaires et des remplaçants ✅
 - Régler bug affichage des remplaçants ✅
