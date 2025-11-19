@@ -1,14 +1,15 @@
 import React from "react";
-import type { Player } from "../../interfaces";
+import type { PlayerUpdate } from "../../interfaces";
 import { Plus } from "lucide-react";
 import Flag from "react-world-flags";
 import { shortNationalities } from "../../config/consts";
 
 interface SubstitutesSectionProps {
-  subs: Record<number, Player>;
+  subs: Record<number, PlayerUpdate>;
   nbOfPlayers: number;
   onAddSubstitute: (index: number) => void;
   onPlayerClick: (index: number) => void;
+  onRemoveSubstitute: (playerId: number) => void;
 }
 
 const SubstitutesSection: React.FC<SubstitutesSectionProps> = ({
@@ -16,6 +17,7 @@ const SubstitutesSection: React.FC<SubstitutesSectionProps> = ({
   nbOfPlayers,
   onAddSubstitute,
   onPlayerClick,
+  onRemoveSubstitute,
 }) => {
   return (
     <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
@@ -47,7 +49,7 @@ const SubstitutesSection: React.FC<SubstitutesSectionProps> = ({
               <div
                 key={player.id}
                 className="group bg-gray-50/10 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative border-gray-200/20"
-                onClick={() => onPlayerClick(player.id)}
+                onClick={() => onPlayerClick(player?.id as number)}
               >
                 <div className="flex flex-row items-center gap-3">
                   {player.photo ? (
@@ -138,7 +140,7 @@ const SubstitutesSection: React.FC<SubstitutesSectionProps> = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    // onRemovePlayer(idx);
+                    onRemoveSubstitute(player?.player_id as number);
                   }}
                   className="absolute top-0.5 right-0.5 opacity-1 group-hover:opacity-100 transition-opacity duration-200 bg-red-500 hover:bg-red-600 text-white rounded-full w-2 h-2 flex items-center justify-center text-xs font-bold shadow-lg"
                   title="Supprimer le joueur"

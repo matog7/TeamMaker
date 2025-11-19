@@ -150,6 +150,12 @@ export const teamAPI = {
     const response = await api.delete(`/teams/${id}`);
     return response.data;
   },
+
+  // Supprimer un joueur d'une équipe
+  deletePlayer: async (teamId: number, playerId: number) => {
+    const response = await api.delete(`/team-players/${teamId}/${playerId}`);
+    return response.data;
+  },
 };
 
 // API des statistiques des joueurs

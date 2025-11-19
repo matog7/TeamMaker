@@ -255,9 +255,14 @@ function App() {
   };
 
   // Supprime un joueur de l'équipe
-  const removePlayer = (index: number) => {
+  const removePlayer = async (index: number) => {
     const newPlayers = { ...players };
+    const playerToDelete: PlayerUpdate = newPlayers[index];
     delete newPlayers[index];
+    await teamAPI.deletePlayer(
+      selectedTeam?.id as number,
+      playerToDelete?.player_id as number
+    );
     setPlayers(newPlayers);
     toast.success("Joueur supprimé de l'équipe !", {
       duration: 3000,
@@ -266,6 +271,20 @@ function App() {
         background: "#EF4444",
         color: "#fff",
       },
+    });
+  };
+
+  const removeSubstitute = async (playerId: number) => {
+    const newSubs = { ...subs };
+    delete newSubs[playerId];
+    setSubs(newSubs);
+    await teamAPI.deletePlayer(
+      selectedTeam?.id as number,
+      playerId
+    );
+    toast.success("Remplaçant supprimé de l'équipe !", {
+      duration: 3000,
+      position: "top-right",
     });
   };
 
@@ -777,6 +796,7 @@ function App() {
                     nbOfPlayers={Object.keys(players).length}
                     onAddSubstitute={openModal}
                     onPlayerClick={openModal}
+                    onRemoveSubstitute={removeSubstitute}
                   />
                   <div className="bg-green-300/10 rounded-lg border border-gray-500/50 p-6 flex-1 flex flex-col border-dashed bg-blur-md">
                     <ObjectivesSection teamId={selectedTeam?.id} />

@@ -1,6 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
-import type { Player, FormationWithPositions } from "../../interfaces";
+import type {
+  Player,
+  FormationWithPositions,
+  PlayerUpdate,
+} from "../../interfaces";
 
 interface FootballFieldProps {
   selectedFormation: FormationWithPositions | null;
@@ -43,63 +47,77 @@ const FootballField: React.FC<FootballFieldProps> = ({
             </div>
           </div>
           {/* Positions des joueurs */}
-          {selectedFormation?.positions.map((position, index) => (
-            <motion.div
-              key={index}
-              className="absolute cursor-pointer shadow-lg "
-              style={{
-                left: `${position.x_coordinate}%`,
-                top: `${position.y_coordinate}%`,
-                transform: "translate(-50%, -50%)",
-              }}
-              onClick={() => onPlayerClick(index)}
-            >
-              {players[index] && players[index]?.id !== 0 ? (
-                <div className="flex flex-col items-center">
-                  <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200/50 shadow-lg ">
-                    {players[index].photo ? (
-                      <img
-                        src={`/uploads/${players[index].photo}`}
-                        alt="photo"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 text-lg font-bold">
-                        {(players[index].name || "J")
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .toUpperCase()}
+          {selectedFormation?.positions.map((position, index) => {
+            const hasPlayer = Object.values(players).some(
+              (player: PlayerUpdate) =>
+                player.position_order === position.position_order
+            );
+            return (
+              <motion.div
+                key={index}
+                className="absolute cursor-pointer shadow-lg "
+                style={{
+                  left: `${position.x_coordinate}%`,
+                  top: `${position.y_coordinate}%`,
+                  transform: "translate(-50%, -50%)",
+                }}
+                onClick={() => onPlayerClick(index)}
+              >
+                {/* Si aucun joueur pour cette position → affiche le bouton “+” */}
+                {!hasPlayer && (
+                  <div className="w-16 h-16 bg-white/20 border-2 border-dashed border-gray-200/50 rounded-full flex items-center justify-center">
+                    <div className="text-white text-2xl font-bold">+</div>
+                  </div>
+                )}
+
+                {/* Si un joueur pour cette position → affiche le joueur */}
+                {Object.values(players).map((player: PlayerUpdate) => (
+                  <>
+                    {player.position_order === position.position_order && (
+                      <div className="flex flex-col items-center">
+                        <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-gray-200/50 shadow-lg ">
+                          {player.photo ? (
+                            <img
+                              src={`/uploads/${player.photo}`}
+                              alt="photo"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-600 text-lg font-bold">
+                              {(player.name || "J")
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <div
+                          className={`absolute -top-2  transform -translate-x-1/2 text-xs font-bold ${
+                            player.rating && player.rating > 70
+                              ? "bg-green-600"
+                              : player.rating && player.rating > 60
+                              ? "bg-yellow-500"
+                              : "bg-red-500"
+                          } text-white rounded-full px-2 py-1 border-2 border-gray-200/50 shadow-md `}
+                        >
+                          {player.rating}
+                        </div>
+                        {player.is_captain && (
+                          <div className="absolute -bottom-[-25px] right-0 transform -translate-x-1/2 text-xs font-bold bg-orange-500 text-white rounded-full px-1 py-1 border-2 border-gray-200/50 shadow-md">
+                            C
+                          </div>
+                        )}
+                        <div className="font-bold text-xs text-white mt-1 text-center bg-gray-200/20 px-1 py-0.5 backdrop-blur-sm rounded max-w-25 truncate">
+                          {player.name}
+                        </div>
                       </div>
                     )}
-                  </div>
-                  <div
-                    className={`absolute -top-2  transform -translate-x-1/2 text-xs font-bold ${
-                      players[index].rating && players[index].rating > 70
-                        ? "bg-green-600"
-                        : players[index].rating && players[index].rating > 60
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    } text-white rounded-full px-2 py-1 border-2 border-gray-200/50 shadow-md `}
-                  >
-                    {players[index].rating}
-                  </div>
-                  {players[index].is_captain && (
-                    <div className="absolute -bottom-[-25px] right-0 transform -translate-x-1/2 text-xs font-bold bg-orange-500 text-white rounded-full px-1 py-1 border-2 border-gray-200/50 shadow-md">
-                      C
-                    </div>
-                  )}
-                  <div className="font-bold text-xs text-white mt-1 text-center bg-gray-200/20 px-1 py-0.5 backdrop-blur-sm rounded max-w-25 truncate">
-                    {players[index].name}
-                  </div>
-                </div>
-              ) : (
-                <div className="w-16 h-16 bg-white/20 border-2 border-dashed border-gray-200/50 rounded-full flex items-center justify-center">
-                  <div className="text-white text-2xl font-bold">+</div>
-                </div>
-              )}
-            </motion.div>
-          ))}
+                  </>
+                ))}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </motion.div>
