@@ -58,6 +58,7 @@ function App() {
   // États pour les joueurs
   const [players, setPlayers] = useState<Record<number, Player>>({});
   const [subs, setSubs] = useState<Player[]>([]);
+  const [allPlayers, setAllPlayers] = useState<Player[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
 
   // États pour les editions
@@ -131,6 +132,7 @@ function App() {
         const sortedPlayers = teamWithPlayers.sort(
           (a: TeamPlayer, b: TeamPlayer) => a.position_order - b.position_order
         );
+        setAllPlayers(sortedPlayers);
         if (sortedPlayers.length > 10) {
           const eleven = sortedPlayers.slice(0, 11);
           const subs = sortedPlayers.slice(11);
@@ -666,14 +668,12 @@ function App() {
         <div className="flex justify-center items-center gap-4">
           <span
             onClick={() => setOnglet("equipe")}
-            className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${
-              onglet === "equipe" ? "bg-green-300/10 text-green-300" : ""
-            }`}
+            className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${onglet === "equipe" ? "bg-green-300/10 text-green-300" : ""
+              }`}
           >
             <Users
-              className={`w-4 h-4 ${
-                onglet === "equipe" ? "text-green-300" : ""
-              }`}
+              className={`w-4 h-4 ${onglet === "equipe" ? "text-green-300" : ""
+                }`}
             />
             <p className={`${onglet === "equipe" ? "text-green-300" : ""}`}>
               Equipe
@@ -681,14 +681,12 @@ function App() {
           </span>
           <span
             onClick={() => setOnglet("stats")}
-            className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${
-              onglet === "stats" ? "bg-green-300/10 text-green-300" : ""
-            }`}
+            className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${onglet === "stats" ? "bg-green-300/10 text-green-300" : ""
+              }`}
           >
             <FileChartColumn
-              className={`w-4 h-4 ${
-                onglet === "stats" ? "text-green-300" : ""
-              }`}
+              className={`w-4 h-4 ${onglet === "stats" ? "text-green-300" : ""
+                }`}
             />
             <p className={`${onglet === "stats" ? "text-green-300" : ""}`}>
               Stats
@@ -696,9 +694,8 @@ function App() {
           </span>
           <span
             onClick={() => setOnglet("evos")}
-            className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${
-              onglet === "evos" ? "bg-green-300/10 text-green-300" : ""
-            }`}
+            className={` flex items-center gap-2 bg-black/80 text-sm text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 cursor-pointer transition-colors ${onglet === "evos" ? "bg-green-300/10 text-green-300" : ""
+              }`}
           >
             <TrendingUp
               className={`w-4 h-4 ${onglet === "evos" ? "text-green-300" : ""}`}
@@ -880,7 +877,7 @@ function App() {
       {onglet === "evos" && (
         <div className="flex-1 flex overflow-hidden justify-center items-center">
           <div className="w-full m-10 p-6 bg-green-300/10 rounded-lg border border-gray-500/50 border-dashed bg-blur-md">
-            <EvolutionsList players={players} selectedTeam={selectedTeam} />
+            <EvolutionsList players={allPlayers} selectedTeam={selectedTeam} />
           </div>
         </div>
       )}

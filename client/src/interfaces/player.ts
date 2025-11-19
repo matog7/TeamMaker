@@ -41,6 +41,9 @@ export interface PlayerUpdate {
   rating?: number;
   team_id?: number;
   updated_at?: string;
+  is_loaned?: boolean;
+  is_promoted?: boolean;
+  arrived_in_course?: boolean;
 }
 
 export interface PlayerUpdateSend {

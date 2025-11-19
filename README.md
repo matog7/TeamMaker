@@ -14,5 +14,6 @@
 - Ajouter la liste des blessures ✅
 - Revoir le style & clean code
 - Faire fonctionner la màj des remplaçants
+- Trier les transferts par mercato
 - Bien séparer la récupération des titulaires et des remplaçants ✅
 - Régler bug affichage des remplaçants ✅

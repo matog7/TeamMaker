@@ -3,6 +3,7 @@ import type { PlayerUpdate } from "../../interfaces";
 import { Plus } from "lucide-react";
 import Flag from "react-world-flags";
 import { shortNationalities } from "../../config/consts";
+import { getRatingColor } from "../../utils/ratingColors";
 
 interface SubstitutesSectionProps {
   subs: Record<number, PlayerUpdate>;
@@ -48,7 +49,23 @@ const SubstitutesSection: React.FC<SubstitutesSectionProps> = ({
             .map((player) => (
               <div
                 key={player.id}
-                className="group bg-gray-50/10 rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative border-gray-200/20"
+                className={`group  ${player?.is_loaned
+                  ? "bg-blue-500/10"
+                  : player?.arrived_in_course
+                    ? "bg-green-500/10"
+                    : player?.is_promoted
+                      ? "bg-yellow-500/10"
+                      : "bg-gray-50/10"
+                  } rounded-lg border p-4 cursor-pointer hover:bg-gray-200/20 hover:border-[#03af62] transition-colors relative ${player?.is_captain
+                    ? "border-orange-300/20 bg-orange-500/10"
+                    : player?.is_loaned
+                      ? "border-blue-500/50"
+                      : player?.arrived_in_course
+                        ? "border-green-500/50"
+                        : player?.is_promoted
+                          ? "border-yellow-500/50"
+                          : "border-gray-200/20"
+                  }`}
                 onClick={() => onPlayerClick(player?.id as number)}
               >
                 <div className="flex flex-row items-center gap-3">
@@ -95,41 +112,14 @@ const SubstitutesSection: React.FC<SubstitutesSectionProps> = ({
                   <div className="flex-shrink-0">
                     <div className="flex justify-center gap-1 text-xs">
                       <span
-                        className={`px-2 py-1 rounded-full text-white font-medium ${
-                          (player.rating || 0) > 80
-                            ? "bg-green-700"
-                            : (player.rating || 0) > 70 &&
-                              (player.rating || 0) <= 80
-                            ? "bg-green-500"
-                            : (player.rating || 0) > 65 &&
-                              (player.rating || 0) <= 70
-                            ? "bg-yellow-400"
-                            : (player.rating || 0) > 60 &&
-                              (player.rating || 0) <= 65
-                            ? "bg-yellow-500"
-                            : "bg-red-500"
-                        }`}
+                        className={`px-2 py-1 rounded-full text-white font-medium ${getRatingColor(player.rating)
+                          }`}
                       >
                         {player.rating || 0}
                       </span>
                       <span
-                        className={`px-2 py-1 rounded-full text-white font-medium ${
-                          (player.potential || 0) >= 80
-                            ? "bg-green-700"
-                            : (player.potential || 0) > 70 &&
-                              (player.potential || 0) <= 80
-                            ? "bg-green-500"
-                            : (player.potential || 0) > 65 &&
-                              (player.potential || 0) <= 70
-                            ? "bg-yellow-400"
-                            : (player.potential || 0) > 60 &&
-                              (player.potential || 0) <= 65
-                            ? "bg-yellow-500"
-                            : (player.potential || 0) >= 50 &&
-                              (player.potential || 0) < 60
-                            ? "bg-orange-500"
-                            : "bg-red-500"
-                        }`}
+                        className={`px-2 py-1 rounded-full text-white font-medium ${getRatingColor(player.potential)
+                          }`}
                       >
                         {player.potential || 0}
                       </span>
